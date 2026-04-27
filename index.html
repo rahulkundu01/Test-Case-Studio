@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TestCase Studio — QA Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --ink:       #0A0A0F;
+  --ink2:      #1A1A2E;
+  --ink3:      #2D2D44;
+  --mist:      #F4F2EE;
+  --mist2:     #ECEAE4;
+  --mist3:     #DDD9D0;
+  --gold:      #C8922A;
+  --gold-l:    #E8B24A;
+  --teal:      #1A7A72;
+  --teal-l:    #2AA89D;
+  --red:       #C0392B;
+  --red-l:     #E74C3C;
+  --green:     #1E7E44;
+  --green-l:   #27AE60;
+  --blue:      #1A4A8A;
+  --blue-l:    #2E6FBF;
+  --purple:    #5B2D8E;
+  --border:    #D8D4CC;
+  --shadow:    0 1px 3px rgba(10,10,15,0.08), 0 4px 16px rgba(10,10,15,0.06);
+  --shadow-lg: 0 8px 32px rgba(10,10,15,0.14), 0 2px 8px rgba(10,10,15,0.08);
+  --r:         10px;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-body:  'Outfit', sans-serif;
+  --font-mono:  'DM Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--mist);
+  color: var(--ink);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+.header {
+  background: var(--ink);
+  color: var(--mist);
+  padding: 0 32px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.logo-mark {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  color: var(--mist);
+  letter-spacing: -0.5px;
+}
+
+.logo-mark em {
+  color: var(--gold-l);
+  font-style: italic;
+}
+
+.logo-tag {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #666;
+  padding: 2px 8px;
+  border: 1px solid #333;
+  border-radius: 3px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.api-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  padding: 6px 12px;
+}
+.api-badge label { font-size: 10px; color: #888; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
+.api-badge input { background: none; border: none; color: var(--mist); font-family: var(--font-mono); font-size: 12px; width: 200px; outline: none; }
+.api-dot { width: 7px; height: 7px; border-radius: 50%; background: #444; transition: all 0.3s; flex-shrink: 0; }
+.api-dot.on { background: var(--green-l); box-shadow: 0 0 8px var(--green-l); }
+
+/* ── Layout ─────────────────────────────────────────────────────────────── */
+.app {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  min-height: calc(100vh - 60px);
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────────────── */
+.sidebar {
+  background: #fff;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  padding: 20px;
+  border-bottom: 1px solid var(--mist2);
+}
+
+.sidebar-section:last-child { border-bottom: none; }
+
+.section-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #999;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::after { content: ''; flex: 1; height: 1px; background: var(--mist2); }
+
+/* Document Upload Zone */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--r);
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--mist);
+  position: relative;
+}
+.upload-zone:hover, .upload-zone.drag { border-color: var(--gold); background: rgba(200,146,42,0.04); }
+.upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.upload-icon { font-size: 28px; margin-bottom: 8px; display: block; }
+.upload-title { font-weight: 600; font-size: 13px; color: var(--ink); }
+.upload-sub { font-size: 11px; color: #999; margin-top: 4px; }
+.upload-formats { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+.fmt-badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 3px; letter-spacing: 1px; }
+.fmt-pdf { background: #FDECEA; color: var(--red); }
+.fmt-doc { background: #E8EEF8; color: var(--blue); }
+.fmt-txt { background: #F0F0F0; color: #555; }
+.fmt-xls { background: #E6F4EA; color: var(--green); }
+
+.uploaded-files { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.uploaded-file {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 6px;
+  background: var(--mist); border: 1px solid var(--border);
+  font-size: 12px;
+}
+.uf-icon { font-size: 16px; flex-shrink: 0; }
+.uf-name { flex: 1; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.uf-size { color: #999; font-family: var(--font-mono); font-size: 10px; }
+.uf-remove { background: none; border: none; color: #ccc; cursor: pointer; font-size: 14px; padding: 0 2px; }
+.uf-remove:hover { color: var(--red); }
+
+/* Text paste area */
+.paste-area {
+  width: 100%; min-height: 100px; max-height: 200px;
+  background: var(--mist); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 10px 12px;
+  font-family: var(--font-body); font-size: 12px; color: var(--ink);
+  resize: vertical; outline: none; transition: border-color 0.2s;
+  line-height: 1.6;
+}
+.paste-area:focus { border-color: var(--gold); }
+
+/* Options */
+.opts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.opt-group label { display: block; font-size: 10px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+select, .text-input {
+  width: 100%; padding: 7px 10px;
+  background: var(--mist); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--ink);
+  font-family: var(--font-body); font-size: 12px;
+  outline: none; transition: border-color 0.2s; cursor: pointer;
+}
+select:focus, .text-input:focus { border-color: var(--gold); }
+.text-input { cursor: text; }
+
+.check-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: #555; cursor: pointer; padding: 3px 0;
+}
+.check-row input { accent-color: var(--teal); cursor: pointer; }
+
+/* Generate button */
+.btn-generate {
+  width: 100%; padding: 13px;
+  background: var(--ink); color: var(--mist);
+  border: none; border-radius: var(--r);
+  font-family: var(--font-body); font-size: 14px; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  gap: 8px; transition: all 0.2s; letter-spacing: 0.2px;
+  position: relative; overflow: hidden;
+}
+.btn-generate::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(200,146,42,0.15), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.4s;
+}
+.btn-generate:hover::before { transform: translateX(100%); }
+.btn-generate:hover { background: var(--ink2); }
+.btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-generate .spin { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+.btn-generate.loading .spin { display: block; }
+.btn-generate.loading .btn-lbl { display: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Stats strip */
+.stats-strip {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: var(--border);
+  border-radius: 8px; overflow: hidden;
+  margin-bottom: 12px;
+}
+.stat-box { background: #fff; padding: 10px; text-align: center; }
+.stat-num { font-size: 22px; font-weight: 700; font-family: var(--font-serif); color: var(--ink); }
+.stat-lbl { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-top: 1px; }
+
+/* ── Main Panel ───────────────────────────────────────────────────────────── */
+.main-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Tab Bar */
+.tab-bar {
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 0;
+  position: sticky;
+  top: 60px;
+  z-index: 100;
+}
+
+.tab-btn {
+  padding: 16px 20px;
+  border: none;
+  background: none;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: #999;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+.tab-btn:hover { color: var(--ink); }
+.tab-btn.active { color: var(--ink); border-bottom-color: var(--gold); }
+
+.tab-badge {
+  font-size: 10px; font-weight: 700;
+  padding: 1px 6px; border-radius: 10px;
+  background: var(--mist2); color: #777;
+}
+.tab-btn.active .tab-badge { background: var(--gold); color: #fff; }
+
+.tab-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+.btn-outline {
+  padding: 6px 14px; border-radius: 6px;
+  border: 1px solid var(--border); background: #fff;
+  font-family: var(--font-body); font-size: 12px; font-weight: 500;
+  color: var(--ink); cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; gap: 6px;
+}
+.btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+.btn-filled {
+  padding: 6px 14px; border-radius: 6px;
+  border: none; background: var(--teal);
+  font-family: var(--font-body); font-size: 12px; font-weight: 600;
+  color: #fff; cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; gap: 6px;
+}
+.btn-filled:hover { background: var(--teal-l); }
+
+.btn-danger {
+  padding: 6px 14px; border-radius: 6px;
+  border: 1px solid var(--red); background: #fff;
+  font-family: var(--font-body); font-size: 12px; font-weight: 600;
+  color: var(--red); cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; gap: 6px;
+}
+.btn-danger:hover { background: var(--red); color: #fff; }
+
+/* ── Content area ────────────────────────────────────────────────────────── */
+.content-area { flex: 1; overflow-y: auto; padding: 24px; }
+
+.view { display: none; }
+.view.active { display: block; }
+
+/* ── Empty State ─────────────────────────────────────────────────────────── */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 80px 40px; text-align: center; gap: 12px;
+}
+.es-glyph { font-family: var(--font-serif); font-size: 72px; color: var(--mist3); line-height: 1; }
+.es-title { font-family: var(--font-serif); font-size: 28px; color: var(--ink2); }
+.es-sub { font-size: 13px; color: #999; max-width: 340px; line-height: 1.7; }
+.es-steps {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 16px; margin-top: 24px; width: 100%; max-width: 600px;
+}
+.es-step {
+  background: #fff; border: 1px solid var(--border); border-radius: var(--r);
+  padding: 16px; text-align: left;
+}
+.es-step-num { font-family: var(--font-serif); font-size: 28px; color: var(--gold); }
+.es-step-title { font-weight: 600; font-size: 13px; margin: 4px 0 2px; }
+.es-step-sub { font-size: 11px; color: #999; }
+
+/* ── Test Case Table ─────────────────────────────────────────────────────── */
+.tc-table-wrap { overflow-x: auto; }
+
+.tc-table {
+  width: 100%; border-collapse: collapse;
+  background: #fff; border-radius: var(--r);
+  overflow: hidden; box-shadow: var(--shadow);
+  font-size: 13px;
+}
+
+.tc-table thead tr { background: var(--ink); color: var(--mist); }
+.tc-table th {
+  padding: 12px 14px; text-align: left;
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tc-table tbody tr { border-bottom: 1px solid var(--mist2); transition: background 0.1s; }
+.tc-table tbody tr:hover { background: rgba(200,146,42,0.03); }
+.tc-table tbody tr:last-child { border-bottom: none; }
+
+.tc-table td { padding: 11px 14px; vertical-align: top; }
+
+.tc-id { font-family: var(--font-mono); font-size: 11px; color: #888; white-space: nowrap; }
+.tc-title-cell { font-weight: 600; color: var(--ink); min-width: 200px; }
+.tc-module { font-size: 11px; }
+
+.pri-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 4px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+  white-space: nowrap;
+}
+.pri-critical { background: #FDECEA; color: var(--red); }
+.pri-high     { background: #FEF3E2; color: var(--gold); }
+.pri-medium   { background: #E8EEF8; color: var(--blue); }
+.pri-low      { background: #E6F4EA; color: var(--green); }
+
+.type-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 4px;
+  font-size: 10px; font-weight: 600; background: var(--mist2); color: #555;
+}
+
+.status-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 4px;
+  font-size: 10px; font-weight: 600;
+}
+.status-not-run  { background: var(--mist2); color: #777; }
+.status-pass     { background: #E6F4EA; color: var(--green); }
+.status-fail     { background: #FDECEA; color: var(--red); }
+.status-blocked  { background: #FEF3E2; color: var(--gold); }
+
+.steps-cell { font-size: 12px; color: #555; min-width: 180px; max-width: 280px; line-height: 1.7; }
+.expected-cell { font-size: 12px; color: var(--teal); min-width: 150px; max-width: 220px; line-height: 1.7; }
+
+.cell-actions { display: flex; gap: 4px; }
+.tc-action-btn {
+  padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border);
+  background: #fff; font-size: 10px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.tc-action-btn:hover { border-color: var(--gold); color: var(--gold); }
+.tc-action-btn.bug { border-color: var(--red-l); color: var(--red); }
+.tc-action-btn.bug:hover { background: var(--red); color: #fff; }
+
+.status-select {
+  padding: 3px 6px; border-radius: 4px; border: 1px solid var(--border);
+  background: #fff; font-size: 11px; font-family: var(--font-body);
+  outline: none; cursor: pointer; color: var(--ink);
+}
+
+/* ── Test Case Detail ────────────────────────────────────────────────────── */
+.tc-detail-card {
+  background: #fff; border: 1px solid var(--border);
+  border-radius: var(--r); margin-bottom: 16px;
+  box-shadow: var(--shadow); overflow: hidden;
+}
+.tc-detail-header {
+  background: var(--ink); color: var(--mist);
+  padding: 16px 20px; display: flex; align-items: flex-start; justify-content: space-between;
+}
+.tc-detail-id { font-family: var(--font-mono); font-size: 11px; color: var(--gold-l); margin-bottom: 4px; }
+.tc-detail-title { font-family: var(--font-serif); font-size: 20px; line-height: 1.3; }
+.tc-detail-meta { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+
+.tc-detail-body { padding: 20px; }
+.tc-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.tc-detail-field label { font-size: 10px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; display: block; }
+.tc-detail-field p { font-size: 13px; color: var(--ink); }
+
+.steps-list { list-style: none; }
+.step-item {
+  display: flex; gap: 12px; padding: 10px 0;
+  border-bottom: 1px solid var(--mist2);
+}
+.step-item:last-child { border-bottom: none; }
+.step-num {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--ink); color: var(--mist);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; flex-shrink: 0;
+}
+.step-content { flex: 1; }
+.step-action { font-size: 13px; font-weight: 500; color: var(--ink); }
+.step-expected { font-size: 12px; color: var(--teal); margin-top: 2px; }
+.step-expected::before { content: '→ '; font-weight: 600; }
+
+/* ── Bug Report Modal ────────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(10,10,15,0.6);
+  z-index: 1000; display: flex; align-items: center; justify-content: center;
+  padding: 20px; backdrop-filter: blur(4px);
+  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: #fff; border-radius: 14px;
+  width: 100%; max-width: 680px; max-height: 90vh;
+  overflow-y: auto; box-shadow: var(--shadow-lg);
+  transform: translateY(16px) scale(0.98);
+  transition: transform 0.25s ease;
+}
+.modal-overlay.open .modal { transform: none; }
+
+.modal-header {
+  background: var(--red); color: #fff;
+  padding: 20px 24px; border-radius: 14px 14px 0 0;
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.modal-title { font-family: var(--font-serif); font-size: 22px; }
+.modal-subtitle { font-size: 12px; opacity: 0.85; margin-top: 3px; }
+.modal-close { background: none; border: none; color: rgba(255,255,255,0.7); font-size: 20px; cursor: pointer; }
+.modal-close:hover { color: #fff; }
+
+.modal-body { padding: 24px; }
+
+.bug-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.bug-field { display: flex; flex-direction: column; gap: 5px; }
+.bug-field.full { grid-column: 1 / -1; }
+.bug-field label { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+.bug-field input, .bug-field select, .bug-field textarea {
+  padding: 9px 12px;
+  border: 1px solid var(--border); border-radius: 7px;
+  background: var(--mist); color: var(--ink);
+  font-family: var(--font-body); font-size: 13px;
+  outline: none; transition: border-color 0.2s;
+  resize: vertical;
+}
+.bug-field input:focus, .bug-field select:focus, .bug-field textarea:focus { border-color: var(--red-l); }
+
+.severity-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.sev-opt { display: none; }
+.sev-lbl {
+  padding: 7px 4px; border-radius: 6px; border: 1px solid var(--border);
+  text-align: center; font-size: 11px; font-weight: 600; cursor: pointer;
+  transition: all 0.15s;
+}
+.sev-opt:checked + .sev-lbl { border-color: var(--red); color: var(--red); background: rgba(192,57,43,0.08); }
+.sev-critical + .sev-lbl { color: var(--red); }
+.sev-high + .sev-lbl { color: var(--gold); }
+.sev-medium + .sev-lbl { color: var(--blue); }
+.sev-low + .sev-lbl { color: var(--green); }
+
+.bug-id-display {
+  font-family: var(--font-mono); font-size: 13px; font-weight: 500;
+  padding: 9px 12px; background: var(--mist2); border-radius: 7px;
+  color: var(--ink); border: 1px solid var(--border);
+}
+
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--mist2); display: flex; gap: 8px; justify-content: flex-end; }
+
+/* ── Bug List ─────────────────────────────────────────────────────────────── */
+.bug-card {
+  background: #fff; border: 1px solid var(--border);
+  border-left: 4px solid var(--red); border-radius: var(--r);
+  padding: 16px 20px; margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+.bug-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+.bug-card-id { font-family: var(--font-mono); font-size: 11px; color: #999; }
+.bug-card-title { font-weight: 600; font-size: 14px; color: var(--ink); margin-top: 2px; }
+.bug-card-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; font-size: 11px; color: #777; align-items: center; }
+.bug-card-meta span { display: flex; align-items: center; gap: 3px; }
+
+.bug-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #999; margin-bottom: 4px; }
+.bug-section-body { font-size: 12px; color: #555; line-height: 1.7; white-space: pre-wrap; }
+.bug-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+
+/* ── Progress / Chat ─────────────────────────────────────────────────────── */
+.gen-progress {
+  background: var(--ink); color: var(--mist);
+  border-radius: var(--r); padding: 20px 24px; margin-bottom: 20px;
+  display: none;
+}
+.gen-progress.show { display: block; }
+.progress-title { font-family: var(--font-mono); font-size: 12px; color: var(--gold-l); margin-bottom: 8px; }
+.progress-log { font-family: var(--font-mono); font-size: 12px; line-height: 1.8; max-height: 120px; overflow-y: auto; }
+.progress-log .line { opacity: 0; animation: fadein 0.3s forwards; }
+@keyframes fadein { to { opacity: 1; } }
+
+/* ── Filters ─────────────────────────────────────────────────────────────── */
+.filters-bar {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  padding: 14px 24px; background: #fff; border-bottom: 1px solid var(--border);
+}
+.filter-chip {
+  padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border);
+  background: #fff; font-size: 11px; font-weight: 600; cursor: pointer;
+  transition: all 0.15s; color: #777;
+}
+.filter-chip.active { background: var(--ink); color: var(--mist); border-color: var(--ink); }
+.filter-chip:hover:not(.active) { border-color: var(--gold); color: var(--gold); }
+
+/* ── Toast ────────────────────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+  padding: 12px 18px; border-radius: var(--r);
+  background: var(--ink); color: var(--mist); font-size: 13px;
+  box-shadow: var(--shadow-lg); transform: translateY(20px);
+  opacity: 0; transition: all 0.25s; pointer-events: none;
+  display: flex; align-items: center; gap: 8px;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.ok { border-left: 3px solid var(--green-l); }
+.toast.err { border-left: 3px solid var(--red-l); }
+
+/* ── Scrollbar ────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-mark">Test<em>Case</em> Studio</div>
+    <div class="logo-tag">ISTQB Standard</div>
+  </div>
+  <div class="header-right">
+    <div class="api-badge">
+      <div class="api-dot" id="api-dot"></div>
+      <label>API KEY</label>
+      <input type="password" id="api-key" placeholder="sk-ant-..." autocomplete="off">
+    </div>
+  </div>
+</header>
+
+<!-- App -->
+<div class="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+
+    <!-- Upload -->
+    <div class="sidebar-section">
+      <div class="section-title">Documents</div>
+
+      <div class="upload-zone" id="drop-zone">
+        <input type="file" id="file-input" multiple accept=".pdf,.doc,.docx,.txt,.xls,.xlsx,.csv">
+        <span class="upload-icon">📂</span>
+        <div class="upload-title">Drop documents here</div>
+        <div class="upload-sub">or click to browse</div>
+        <div class="upload-formats">
+          <span class="fmt-badge fmt-pdf">PDF</span>
+          <span class="fmt-badge fmt-doc">DOCX</span>
+          <span class="fmt-badge fmt-xls">XLSX</span>
+          <span class="fmt-badge fmt-txt">TXT</span>
+          <span class="fmt-badge fmt-txt">CSV</span>
+        </div>
+      </div>
+      <div class="uploaded-files" id="uploaded-files"></div>
+
+      <div style="margin-top:12px">
+        <div style="font-size:11px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Or paste content</div>
+        <textarea class="paste-area" id="paste-area" placeholder="Paste BRS, FRS or test plan content here..."></textarea>
+      </div>
+    </div>
+
+    <!-- Options -->
+    <div class="sidebar-section">
+      <div class="section-title">Configuration</div>
+      <div class="opts-grid">
+        <div class="opt-group">
+          <label>Project Name</label>
+          <input type="text" class="text-input" id="opt-project" placeholder="My Project">
+        </div>
+        <div class="opt-group">
+          <label>Module</label>
+          <input type="text" class="text-input" id="opt-module" placeholder="e.g. Login">
+        </div>
+        <div class="opt-group">
+          <label>Version</label>
+          <input type="text" class="text-input" id="opt-version" placeholder="v1.0">
+        </div>
+        <div class="opt-group">
+          <label>Prepared By</label>
+          <input type="text" class="text-input" id="opt-author" placeholder="QA Engineer">
+        </div>
+        <div class="opt-group">
+          <label>Test Type</label>
+          <select id="opt-type">
+            <option>Functional</option>
+            <option>Integration</option>
+            <option>Regression</option>
+            <option>UAT</option>
+            <option>Smoke</option>
+          </select>
+        </div>
+        <div class="opt-group">
+          <label>Priority Focus</label>
+          <select id="opt-priority">
+            <option value="all">All Priorities</option>
+            <option value="critical">Critical Only</option>
+            <option value="high">High & Critical</option>
+            <option value="medium">Medium+</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:10px;display:flex;flex-direction:column;gap:5px">
+        <label class="check-row"><input type="checkbox" id="chk-edge" checked> Include edge cases</label>
+        <label class="check-row"><input type="checkbox" id="chk-neg" checked> Include negative tests</label>
+        <label class="check-row"><input type="checkbox" id="chk-data"> Include test data examples</label>
+        <label class="check-row"><input type="checkbox" id="chk-api"> Include API test cases</label>
+        <label class="check-row"><input type="checkbox" id="chk-prereq"> List prerequisites per test</label>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="sidebar-section">
+      <div class="section-title">Summary</div>
+      <div class="stats-strip">
+        <div class="stat-box"><div class="stat-num" id="stat-total">0</div><div class="stat-lbl">Total TCs</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-pass" style="color:var(--green)">0</div><div class="stat-lbl">Pass</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-fail" style="color:var(--red)">0</div><div class="stat-lbl">Fail</div></div>
+      </div>
+      <div class="stats-strip" style="margin-top:1px">
+        <div class="stat-box"><div class="stat-num" id="stat-bugs" style="color:var(--red)">0</div><div class="stat-lbl">Bugs</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-critical" style="color:var(--gold)">0</div><div class="stat-lbl">Critical</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-notrun" style="color:#999">0</div><div class="stat-lbl">Not Run</div></div>
+      </div>
+    </div>
+
+    <!-- Generate -->
+    <div class="sidebar-section">
+      <button class="btn-generate" id="btn-generate" onclick="generateTestCases()">
+        <div class="spin"></div>
+        <span class="btn-lbl">✦ Generate Test Cases</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- Main Panel -->
+  <main class="main-panel">
+
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('overview', this)">📋 Overview</button>
+      <button class="tab-btn" onclick="switchTab('table', this)">⊞ Test Cases <span class="tab-badge" id="tc-count">0</span></button>
+      <button class="tab-btn" onclick="switchTab('detail', this)">🔍 Detail View</button>
+      <button class="tab-btn" onclick="switchTab('bugs', this)">🐛 Bug Reports <span class="tab-badge" id="bug-count">0</span></button>
+      <div class="tab-actions">
+        <button class="btn-outline" onclick="exportExcel()">⬇ Export Excel</button>
+        <button class="btn-outline" onclick="exportCSV()">⬇ Export CSV</button>
+        <button class="btn-danger" onclick="openBugModal(null)" id="btn-report-bug">🐛 Report Bug</button>
+      </div>
+    </div>
+
+    <!-- Progress log -->
+    <div style="padding:0 24px;padding-top:16px">
+      <div class="gen-progress" id="gen-progress">
+        <div class="progress-title">⚙ Generating ISTQB-compliant test cases...</div>
+        <div class="progress-log" id="progress-log"></div>
+      </div>
+    </div>
+
+    <!-- Filters (shown on table view) -->
+    <div class="filters-bar" id="filters-bar" style="display:none">
+      <span style="font-size:11px;font-weight:600;color:#999;align-self:center">Filter:</span>
+      <button class="filter-chip active" onclick="filterTC('all', this)">All</button>
+      <button class="filter-chip" onclick="filterTC('not-run', this)">Not Run</button>
+      <button class="filter-chip" onclick="filterTC('pass', this)">Pass</button>
+      <button class="filter-chip" onclick="filterTC('fail', this)">Fail</button>
+      <button class="filter-chip" onclick="filterTC('blocked', this)">Blocked</button>
+      <button class="filter-chip" onclick="filterTC('critical', this)" style="border-color:var(--red);color:var(--red)">Critical</button>
+      <button class="filter-chip" onclick="filterTC('high', this)" style="border-color:var(--gold);color:var(--gold)">High</button>
+      <input type="text" style="padding:5px 12px;border:1px solid var(--border);border-radius:20px;font-size:11px;outline:none;margin-left:auto;width:180px" placeholder="Search test cases..." oninput="searchTC(this.value)">
+    </div>
+
+    <!-- Content Views -->
+    <div class="content-area">
+
+      <!-- Overview -->
+      <div class="view active" id="view-overview">
+        <div class="empty-state" id="empty-state">
+          <div class="es-glyph">§</div>
+          <h2 class="es-title">Document to Test Cases</h2>
+          <p class="es-sub">Upload your BRS, FRS, or test plan documents and let AI generate complete ISTQB-standard test cases automatically.</p>
+          <div class="es-steps">
+            <div class="es-step"><div class="es-step-num">1</div><div class="es-step-title">Upload Documents</div><div class="es-step-sub">PDF, Word, Excel, or paste text directly</div></div>
+            <div class="es-step"><div class="es-step-num">2</div><div class="es-step-title">Configure</div><div class="es-step-sub">Set project, module, test type and preferences</div></div>
+            <div class="es-step"><div class="es-step-num">3</div><div class="es-step-title">Generate & Execute</div><div class="es-step-sub">Review cases, update status, report bugs</div></div>
+          </div>
+        </div>
+        <div id="overview-content" style="display:none">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px" id="overview-cards"></div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)">
+            <div style="font-family:var(--font-serif);font-size:20px;margin-bottom:16px">Document Analysis</div>
+            <div id="doc-analysis" style="font-size:13px;color:#555;line-height:1.9;white-space:pre-wrap"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table View -->
+      <div class="view" id="view-table">
+        <div class="tc-table-wrap">
+          <table class="tc-table" id="tc-table">
+            <thead>
+              <tr>
+                <th>TC ID</th>
+                <th>Title</th>
+                <th>Module</th>
+                <th>Type</th>
+                <th>Priority</th>
+                <th>Prerequisites</th>
+                <th>Test Steps</th>
+                <th>Expected Result</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tc-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Detail View -->
+      <div class="view" id="view-detail">
+        <div id="detail-list"></div>
+      </div>
+
+      <!-- Bug Reports -->
+      <div class="view" id="view-bugs">
+        <div id="bug-list">
+          <div class="empty-state" style="padding:40px">
+            <div class="es-glyph" style="font-size:48px">🐛</div>
+            <h2 class="es-title" style="font-size:22px">No bugs reported yet</h2>
+            <p class="es-sub">Click "Report Bug" on any test case or use the button above.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Bug Report Modal -->
+<div class="modal-overlay" id="bug-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">🐛 Bug Report</div>
+        <div class="modal-subtitle">ISTQB Defect Report Template</div>
+      </div>
+      <button class="modal-close" onclick="closeBugModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="bug-form-grid">
+        <!-- Bug ID -->
+        <div class="bug-field">
+          <label>Bug ID</label>
+          <div class="bug-id-display" id="bug-id-display">BUG-001</div>
+        </div>
+        <!-- Date -->
+        <div class="bug-field">
+          <label>Date Reported</label>
+          <input type="date" id="bug-date">
+        </div>
+        <!-- TC Ref -->
+        <div class="bug-field">
+          <label>Test Case Reference</label>
+          <input type="text" id="bug-tc-ref" placeholder="TC-001">
+        </div>
+        <!-- Reported By -->
+        <div class="bug-field">
+          <label>Reported By</label>
+          <input type="text" id="bug-reporter" placeholder="QA Engineer">
+        </div>
+        <!-- Title -->
+        <div class="bug-field full">
+          <label>Bug Title / Summary</label>
+          <input type="text" id="bug-title" placeholder="Brief description of the defect...">
+        </div>
+        <!-- Severity -->
+        <div class="bug-field full">
+          <label>Severity</label>
+          <div class="severity-grid">
+            <div><input type="radio" name="bug-sev" id="sev-critical" class="sev-opt sev-critical" value="Critical" checked><label for="sev-critical" class="sev-lbl">🔴 Critical</label></div>
+            <div><input type="radio" name="bug-sev" id="sev-high" class="sev-opt sev-high" value="High"><label for="sev-high" class="sev-lbl">🟡 High</label></div>
+            <div><input type="radio" name="bug-sev" id="sev-medium" class="sev-opt sev-medium" value="Medium"><label for="sev-medium" class="sev-lbl">🔵 Medium</label></div>
+            <div><input type="radio" name="bug-sev" id="sev-low" class="sev-opt sev-low" value="Low"><label for="sev-low" class="sev-lbl">🟢 Low</label></div>
+          </div>
+        </div>
+        <!-- Priority -->
+        <div class="bug-field">
+          <label>Priority</label>
+          <select id="bug-priority">
+            <option>Urgent</option><option>High</option><option>Medium</option><option>Low</option>
+          </select>
+        </div>
+        <!-- Status -->
+        <div class="bug-field">
+          <label>Status</label>
+          <select id="bug-status">
+            <option>New</option><option>Open</option><option>In Progress</option><option>Fixed</option><option>Closed</option><option>Deferred</option>
+          </select>
+        </div>
+        <!-- Module -->
+        <div class="bug-field">
+          <label>Module / Component</label>
+          <input type="text" id="bug-module" placeholder="e.g. Login Module">
+        </div>
+        <!-- Assigned To -->
+        <div class="bug-field">
+          <label>Assigned To</label>
+          <input type="text" id="bug-assignee" placeholder="Developer name">
+        </div>
+        <!-- Environment -->
+        <div class="bug-field">
+          <label>Environment</label>
+          <input type="text" id="bug-env" placeholder="e.g. QA / Staging / Prod">
+        </div>
+        <!-- Build -->
+        <div class="bug-field">
+          <label>Build / Version</label>
+          <input type="text" id="bug-build" placeholder="v1.0.0">
+        </div>
+        <!-- Description -->
+        <div class="bug-field full">
+          <label>Description</label>
+          <textarea id="bug-desc" rows="3" placeholder="Detailed description of the defect..."></textarea>
+        </div>
+        <!-- Steps to Reproduce -->
+        <div class="bug-field full">
+          <label>Steps to Reproduce</label>
+          <textarea id="bug-steps" rows="5" placeholder="1. Navigate to...&#10;2. Click on...&#10;3. Enter...&#10;4. Click Submit"></textarea>
+        </div>
+        <!-- Expected -->
+        <div class="bug-field">
+          <label>Expected Result</label>
+          <textarea id="bug-expected" rows="3" placeholder="What should happen..."></textarea>
+        </div>
+        <!-- Actual -->
+        <div class="bug-field">
+          <label>Actual Result</label>
+          <textarea id="bug-actual" rows="3" placeholder="What actually happened..."></textarea>
+        </div>
+        <!-- Impact -->
+        <div class="bug-field full">
+          <label>Impact / Risk</label>
+          <textarea id="bug-impact" rows="2" placeholder="Business impact of this defect..."></textarea>
+        </div>
+        <!-- Attachments note -->
+        <div class="bug-field full">
+          <label>Attachments / Evidence</label>
+          <input type="text" id="bug-attachments" placeholder="Screenshot names, video links, log files...">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="closeBugModal()">Cancel</button>
+      <button class="btn-outline" onclick="exportBugPDF()">⬇ Export PDF</button>
+      <button class="btn-danger" onclick="saveBugReport()">🐛 Save Bug Report</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+let testCases = [];
+let bugReports = [];
+let uploadedContent = [];
+let currentFilter = 'all';
+let bugCounter = 1;
+let activeTCRef = null;
+
+// ── API Key ───────────────────────────────────────────────────────────────────
+const apiKeyEl = document.getElementById('api-key');
+const apiDot   = document.getElementById('api-dot');
+apiKeyEl.addEventListener('input', () => {
+  const valid = apiKeyEl.value.startsWith('sk-ant-') && apiKeyEl.value.length > 20;
+  apiDot.classList.toggle('on', valid);
+  if (valid) localStorage.setItem('tcs_key', apiKeyEl.value);
+});
+const saved = localStorage.getItem('tcs_key');
+if (saved) { apiKeyEl.value = saved; apiDot.classList.add('on'); }
+
+function getKey() {
+  const k = apiKeyEl.value.trim();
+  if (!k) { showToast('Enter your Anthropic API key first', 'err'); return null; }
+  return k;
+}
+
+// ── File Upload ───────────────────────────────────────────────────────────────
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag'); handleFiles(e.dataTransfer.files); });
+fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+async function handleFiles(files) {
+  for (const file of files) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    let content = '';
+    try {
+      if (ext === 'txt' || ext === 'csv') {
+        content = await file.text();
+      } else if (ext === 'docx' || ext === 'doc') {
+        const ab = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer: ab });
+        content = result.value;
+      } else if (ext === 'xlsx' || ext === 'xls') {
+        const ab = await file.arrayBuffer();
+        const wb = XLSX.read(ab, { type: 'array' });
+        content = wb.SheetNames.map(n => {
+          const ws = wb.Sheets[n];
+          return `Sheet: ${n}\n${XLSX.utils.sheet_to_csv(ws)}`;
+        }).join('\n\n');
+      } else if (ext === 'pdf') {
+        content = `[PDF: ${file.name}] — PDF text extraction requires the app to be served. Content will be described by filename.`;
+      } else {
+        content = await file.text();
+      }
+      uploadedContent.push({ name: file.name, size: file.size, content });
+      renderUploadedFiles();
+      showToast(`Loaded: ${file.name}`, 'ok');
+    } catch(e) {
+      showToast(`Error reading ${file.name}: ${e.message}`, 'err');
+    }
+  }
+}
+
+function renderUploadedFiles() {
+  const el = document.getElementById('uploaded-files');
+  el.innerHTML = uploadedContent.map((f, i) => {
+    const ext = f.name.split('.').pop().toUpperCase();
+    const icons = { PDF: '📄', DOCX: '📝', DOC: '📝', XLSX: '📊', XLS: '📊', TXT: '📃', CSV: '📊' };
+    const sz = f.size > 1024*1024 ? (f.size/1024/1024).toFixed(1)+'MB' : Math.round(f.size/1024)+'KB';
+    return `<div class="uploaded-file">
+      <span class="uf-icon">${icons[ext] || '📄'}</span>
+      <span class="uf-name">${f.name}</span>
+      <span class="uf-size">${sz}</span>
+      <button class="uf-remove" onclick="removeFile(${i})">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function removeFile(i) { uploadedContent.splice(i, 1); renderUploadedFiles(); }
+
+// ── Build Prompt ──────────────────────────────────────────────────────────────
+function buildGeneratePrompt() {
+  const paste   = document.getElementById('paste-area').value.trim();
+  const project = document.getElementById('opt-project').value || 'Project';
+  const module  = document.getElementById('opt-module').value || 'General';
+  const version = document.getElementById('opt-version').value || 'v1.0';
+  const author  = document.getElementById('opt-author').value || 'QA Engineer';
+  const type    = document.getElementById('opt-type').value;
+  const priority= document.getElementById('opt-priority').value;
+  const edge    = document.getElementById('chk-edge').checked;
+  const neg     = document.getElementById('chk-neg').checked;
+  const data    = document.getElementById('chk-data').checked;
+  const api     = document.getElementById('chk-api').checked;
+  const prereq  = document.getElementById('chk-prereq').checked;
+
+  const docs = uploadedContent.map(f => `--- Document: ${f.name} ---\n${f.content.slice(0, 3000)}`).join('\n\n');
+  const allContent = [docs, paste].filter(Boolean).join('\n\n');
+
+  if (!allContent.trim()) throw new Error('Please upload documents or paste content first');
+
+  return `You are a senior QA engineer following ISTQB standards. Analyze the following document content (BRS/FRS/Test Plan) and generate comprehensive test cases.
+
+## Document Content:
+${allContent.slice(0, 8000)}
+
+## Project Details:
+- Project: ${project}
+- Module: ${module}
+- Version: ${version}
+- Prepared By: ${author}
+- Test Type: ${type}
+- Priority Focus: ${priority}
+
+## Requirements:
+${edge ? '- Include edge case test scenarios' : ''}
+${neg ? '- Include negative/invalid input test cases' : ''}
+${data ? '- Include specific test data examples in steps' : ''}
+${api ? '- Include API-level test cases where relevant' : ''}
+${prereq ? '- List specific prerequisites for each test case' : ''}
+
+## ISTQB Test Case Format:
+Generate test cases in this EXACT JSON format. Return ONLY valid JSON, no markdown, no explanation:
+
+{
+  "analysis": "Brief summary of what was analyzed and key areas covered (2-3 sentences)",
+  "project": "${project}",
+  "module": "${module}",
+  "version": "${version}",
+  "author": "${author}",
+  "testType": "${type}",
+  "generatedDate": "${new Date().toISOString().slice(0,10)}",
+  "testCases": [
+    {
+      "id": "TC-001",
+      "title": "Verify [feature] with [condition]",
+      "module": "${module}",
+      "feature": "Feature name from document",
+      "objective": "What this test verifies",
+      "type": "${type}",
+      "priority": "Critical|High|Medium|Low",
+      "prerequisites": "System is running, user is logged in, etc.",
+      "testData": "Username: testuser@example.com, Password: Test@123",
+      "steps": [
+        {"step": 1, "action": "Navigate to login page", "expected": "Login page loads with username and password fields"},
+        {"step": 2, "action": "Enter valid username and password", "expected": "Credentials are accepted"},
+        {"step": 3, "action": "Click Login button", "expected": "User is redirected to dashboard"}
+      ],
+      "expectedResult": "Overall expected outcome of the test",
+      "actualResult": "",
+      "status": "Not Run",
+      "remarks": ""
+    }
+  ]
+}
+
+Generate at least 12-18 comprehensive test cases covering:
+1. Happy path / positive scenarios
+2. Negative / invalid input scenarios  
+3. Boundary value scenarios
+4. Edge cases
+5. Integration points
+6. Security/validation scenarios (if applicable)
+${api ? '7. API endpoint validation' : ''}
+
+Prioritize: Critical for core business flows, High for main features, Medium for standard cases, Low for cosmetic/edge.`;
+}
+
+// ── Generate ──────────────────────────────────────────────────────────────────
+async function generateTestCases() {
+  const key = getKey(); if (!key) return;
+  let prompt;
+  try { prompt = buildGeneratePrompt(); } catch(e) { showToast(e.message, 'err'); return; }
+
+  const btn = document.getElementById('btn-generate');
+  btn.classList.add('loading'); btn.disabled = true;
+
+  const progress = document.getElementById('gen-progress');
+  const log = document.getElementById('progress-log');
+  progress.classList.add('show');
+  log.innerHTML = '';
+
+  const addLog = (msg, delay = 0) => setTimeout(() => {
+    log.innerHTML += `<div class="line" style="animation-delay:${delay}ms">▸ ${msg}</div>`;
+    log.scrollTop = log.scrollHeight;
+  }, delay);
+
+  addLog('Reading uploaded documents...', 0);
+  addLog('Analyzing requirements and user stories...', 600);
+  addLog('Applying ISTQB test case standards...', 1200);
+  addLog('Generating positive test scenarios...', 1800);
+  addLog('Generating negative and edge case scenarios...', 2400);
+  addLog('Assigning priorities and test types...', 3000);
+  addLog('Structuring test steps and expected results...', 3600);
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error?.message || `API ${resp.status}`);
+    }
+
+    const data = await resp.json();
+    let raw = data.content[0].text.trim();
+    // Strip markdown fences if present
+    raw = raw.replace(/^```json?\s*/i, '').replace(/```\s*$/i, '').trim();
+    const result = JSON.parse(raw);
+
+    testCases = result.testCases.map((tc, i) => ({
+      ...tc,
+      id: tc.id || `TC-${String(i+1).padStart(3,'0')}`,
+      status: 'Not Run',
+      actualResult: '',
+      remarks: ''
+    }));
+
+    addLog(`✓ Generated ${testCases.length} test cases successfully!`, 4200);
+
+    setTimeout(() => {
+      progress.classList.remove('show');
+      renderAll(result);
+      switchTab('table', document.querySelectorAll('.tab-btn')[1]);
+      updateStats();
+      showToast(`✓ ${testCases.length} test cases generated!`, 'ok');
+    }, 4800);
+
+  } catch(e) {
+    addLog('✗ Error: ' + e.message, 4200);
+    showToast('Error: ' + e.message, 'err');
+  } finally {
+    btn.classList.remove('loading'); btn.disabled = false;
+  }
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderAll(result) {
+  renderOverview(result);
+  renderTable();
+  renderDetailView();
+  document.getElementById('filters-bar').style.display = 'flex';
+}
+
+function renderOverview(result) {
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('overview-content').style.display = 'block';
+
+  const priCounts = { Critical: 0, High: 0, Medium: 0, Low: 0 };
+  testCases.forEach(tc => { if (priCounts[tc.priority] !== undefined) priCounts[tc.priority]++; });
+
+  document.getElementById('overview-cards').innerHTML = [
+    { num: testCases.length, lbl: 'Total Test Cases', color: 'var(--ink)', icon: '📋' },
+    { num: priCounts.Critical, lbl: 'Critical Priority', color: 'var(--red)', icon: '🔴' },
+    { num: priCounts.High, lbl: 'High Priority', color: 'var(--gold)', icon: '🟡' },
+    { num: priCounts.Medium + priCounts.Low, lbl: 'Med & Low Priority', color: 'var(--blue)', icon: '🔵' },
+  ].map(s => `
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)">
+      <div style="font-size:24px;margin-bottom:4px">${s.icon}</div>
+      <div style="font-family:var(--font-serif);font-size:36px;color:${s.color};line-height:1">${s.num}</div>
+      <div style="font-size:11px;color:#999;text-transform:uppercase;letter-spacing:1px;margin-top:4px">${s.lbl}</div>
+    </div>`).join('');
+
+  document.getElementById('doc-analysis').textContent = result.analysis || 'Analysis complete.';
+}
+
+function renderTable(filter = 'all', search = '') {
+  const tbody = document.getElementById('tc-tbody');
+  let tcs = testCases;
+  if (filter === 'not-run') tcs = tcs.filter(t => t.status === 'Not Run');
+  else if (filter === 'pass') tcs = tcs.filter(t => t.status === 'Pass');
+  else if (filter === 'fail') tcs = tcs.filter(t => t.status === 'Fail');
+  else if (filter === 'blocked') tcs = tcs.filter(t => t.status === 'Blocked');
+  else if (filter === 'critical') tcs = tcs.filter(t => t.priority === 'Critical');
+  else if (filter === 'high') tcs = tcs.filter(t => t.priority === 'High' || t.priority === 'Critical');
+  if (search) tcs = tcs.filter(t => t.title.toLowerCase().includes(search.toLowerCase()) || t.id.toLowerCase().includes(search.toLowerCase()));
+
+  tbody.innerHTML = tcs.map(tc => {
+    const steps = (tc.steps || []).map((s, i) => `${i+1}. ${s.action}`).join('\n');
+    const stepsShort = steps.split('\n').slice(0, 3).join('\n') + (steps.split('\n').length > 3 ? '...' : '');
+    return `<tr>
+      <td><span class="tc-id">${tc.id}</span></td>
+      <td><span class="tc-title-cell">${tc.title}</span></td>
+      <td><span class="tc-module" style="font-size:11px;color:#777">${tc.module || ''}</span></td>
+      <td><span class="type-badge">${tc.type || 'Functional'}</span></td>
+      <td><span class="pri-badge pri-${(tc.priority||'medium').toLowerCase()}">${tc.priority}</span></td>
+      <td style="font-size:11px;color:#777;max-width:140px">${tc.prerequisites || '—'}</td>
+      <td><div class="steps-cell" style="white-space:pre-wrap;font-family:var(--font-mono);font-size:11px">${stepsShort}</div></td>
+      <td><div class="expected-cell">${tc.expectedResult || ''}</div></td>
+      <td>
+        <select class="status-select" onchange="updateStatus('${tc.id}', this.value)">
+          ${['Not Run','Pass','Fail','Blocked','Deferred'].map(s =>
+            `<option ${tc.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </td>
+      <td>
+        <div class="cell-actions">
+          <button class="tc-action-btn" onclick="viewDetail('${tc.id}')">Detail</button>
+          <button class="tc-action-btn bug" onclick="openBugModal('${tc.id}')">🐛 Bug</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="10" style="text-align:center;padding:32px;color:#999">No test cases match this filter</td></tr>';
+
+  document.getElementById('tc-count').textContent = testCases.length;
+}
+
+function renderDetailView() {
+  const el = document.getElementById('detail-list');
+  el.innerHTML = testCases.map(tc => `
+    <div class="tc-detail-card" id="detail-${tc.id}">
+      <div class="tc-detail-header">
+        <div>
+          <div class="tc-detail-id">${tc.id}</div>
+          <div class="tc-detail-title">${tc.title}</div>
+          <div class="tc-detail-meta">
+            <span class="pri-badge pri-${(tc.priority||'medium').toLowerCase()}">${tc.priority}</span>
+            <span class="type-badge" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8)">${tc.type || 'Functional'}</span>
+            <span class="status-badge status-not-run" id="detail-status-${tc.id}">${tc.status}</span>
+          </div>
+        </div>
+        <button class="tc-action-btn bug" style="background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.3);color:#fff" onclick="openBugModal('${tc.id}')">🐛 Report Bug</button>
+      </div>
+      <div class="tc-detail-body">
+        <div class="tc-detail-grid">
+          <div class="tc-detail-field"><label>Objective</label><p>${tc.objective || '—'}</p></div>
+          <div class="tc-detail-field"><label>Feature</label><p>${tc.feature || tc.module || '—'}</p></div>
+          <div class="tc-detail-field"><label>Prerequisites</label><p>${tc.prerequisites || 'None'}</p></div>
+          <div class="tc-detail-field"><label>Test Data</label><p style="font-family:var(--font-mono);font-size:12px">${tc.testData || 'N/A'}</p></div>
+        </div>
+        <div style="margin-bottom:16px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#999;margin-bottom:10px">Test Steps</div>
+          <ul class="steps-list">
+            ${(tc.steps||[]).map((s,i) => `
+            <li class="step-item">
+              <div class="step-num">${i+1}</div>
+              <div class="step-content">
+                <div class="step-action">${s.action}</div>
+                <div class="step-expected">${s.expected}</div>
+              </div>
+            </li>`).join('')}
+          </ul>
+        </div>
+        <div style="background:var(--mist);border-left:3px solid var(--teal);padding:12px 16px;border-radius:0 6px 6px 0">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--teal);margin-bottom:4px">Expected Result</div>
+          <div style="font-size:13px;color:var(--ink)">${tc.expectedResult}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function viewDetail(id) {
+  switchTab('detail', document.querySelectorAll('.tab-btn')[2]);
+  setTimeout(() => {
+    const el = document.getElementById('detail-' + id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+// ── Status Update ─────────────────────────────────────────────────────────────
+function updateStatus(id, status) {
+  const tc = testCases.find(t => t.id === id);
+  if (tc) {
+    tc.status = status;
+    if (status === 'Fail') openBugModal(id);
+    updateStats();
+  }
+}
+
+function updateStats() {
+  document.getElementById('stat-total').textContent  = testCases.length;
+  document.getElementById('stat-pass').textContent   = testCases.filter(t => t.status === 'Pass').length;
+  document.getElementById('stat-fail').textContent   = testCases.filter(t => t.status === 'Fail').length;
+  document.getElementById('stat-bugs').textContent   = bugReports.length;
+  document.getElementById('stat-critical').textContent = testCases.filter(t => t.priority === 'Critical').length;
+  document.getElementById('stat-notrun').textContent = testCases.filter(t => t.status === 'Not Run').length;
+  document.getElementById('bug-count').textContent   = bugReports.length;
+}
+
+// ── Filters ───────────────────────────────────────────────────────────────────
+function filterTC(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  renderTable(filter);
+}
+
+function searchTC(val) { renderTable(currentFilter, val); }
+
+// ── Tab Switch ────────────────────────────────────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('view-' + name).classList.add('active');
+  document.getElementById('filters-bar').style.display = (name === 'table' && testCases.length) ? 'flex' : 'none';
+}
+
+// ── Bug Modal ─────────────────────────────────────────────────────────────────
+let bugIdCounter = 1;
+
+function openBugModal(tcId) {
+  activeTCRef = tcId;
+  const tc = tcId ? testCases.find(t => t.id === tcId) : null;
+
+  document.getElementById('bug-id-display').textContent = `BUG-${String(bugIdCounter).padStart(3,'0')}`;
+  document.getElementById('bug-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('bug-tc-ref').value = tcId || '';
+  document.getElementById('bug-reporter').value = document.getElementById('opt-author').value || '';
+  document.getElementById('bug-module').value = (tc?.module || document.getElementById('opt-module').value || '');
+  document.getElementById('bug-build').value = document.getElementById('opt-version').value || '';
+
+  if (tc) {
+    document.getElementById('bug-title').value = `[${tcId}] FAIL: ${tc.title}`;
+    document.getElementById('bug-steps').value = (tc.steps || []).map((s,i) => `${i+1}. ${s.action}`).join('\n');
+    document.getElementById('bug-expected').value = tc.expectedResult || '';
+    document.getElementById('bug-actual').value = tc.actualResult || '';
+    document.getElementById('bug-desc').value = `Defect found while executing test case ${tcId}. The test case "${tc.title}" failed.`;
+  } else {
+    ['bug-title','bug-steps','bug-expected','bug-actual','bug-desc','bug-impact','bug-attachments'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+  }
+
+  document.getElementById('bug-modal').classList.add('open');
+}
+
+function closeBugModal() { document.getElementById('bug-modal').classList.remove('open'); }
+
+function saveBugReport() {
+  const sev = document.querySelector('input[name="bug-sev"]:checked')?.value || 'Medium';
+  const bug = {
+    id: `BUG-${String(bugIdCounter++).padStart(3,'0')}`,
+    date: document.getElementById('bug-date').value,
+    tcRef: document.getElementById('bug-tc-ref').value,
+    reporter: document.getElementById('bug-reporter').value,
+    title: document.getElementById('bug-title').value,
+    severity: sev,
+    priority: document.getElementById('bug-priority').value,
+    status: document.getElementById('bug-status').value,
+    module: document.getElementById('bug-module').value,
+    assignee: document.getElementById('bug-assignee').value,
+    env: document.getElementById('bug-env').value,
+    build: document.getElementById('bug-build').value,
+    desc: document.getElementById('bug-desc').value,
+    steps: document.getElementById('bug-steps').value,
+    expected: document.getElementById('bug-expected').value,
+    actual: document.getElementById('bug-actual').value,
+    impact: document.getElementById('bug-impact').value,
+    attachments: document.getElementById('bug-attachments').value,
+  };
+  if (!bug.title) { showToast('Please enter a bug title', 'err'); return; }
+  bugReports.push(bug);
+  updateStats();
+  renderBugList();
+  closeBugModal();
+  showToast(`Bug ${bug.id} saved!`, 'ok');
+}
+
+function renderBugList() {
+  const el = document.getElementById('bug-list');
+  if (!bugReports.length) {
+    el.innerHTML = `<div class="empty-state" style="padding:40px"><div class="es-glyph" style="font-size:48px">🐛</div><h2 class="es-title" style="font-size:22px">No bugs reported yet</h2></div>`;
+    return;
+  }
+  const sevColor = { Critical: 'var(--red)', High: 'var(--gold)', Medium: 'var(--blue)', Low: 'var(--green)' };
+  el.innerHTML = bugReports.map(b => `
+    <div class="bug-card" style="border-left-color:${sevColor[b.severity]||'var(--red)'}">
+      <div class="bug-card-header">
+        <div>
+          <div class="bug-card-id">${b.id}</div>
+          <div class="bug-card-title">${b.title}</div>
+          <div class="bug-card-meta">
+            <span class="pri-badge pri-${(b.severity||'medium').toLowerCase()}">${b.severity}</span>
+            <span>📅 ${b.date}</span>
+            <span>🧩 ${b.module || '—'}</span>
+            <span>👤 ${b.reporter || '—'}</span>
+            <span>🏗 ${b.build || '—'}</span>
+            <span style="margin-left:auto">
+              <span class="status-badge status-not-run">${b.status}</span>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="bug-card-grid">
+        <div>
+          <div class="bug-section-title">Steps to Reproduce</div>
+          <div class="bug-section-body">${b.steps || '—'}</div>
+        </div>
+        <div>
+          <div class="bug-section-title">Expected vs Actual</div>
+          <div style="font-size:12px;color:var(--teal);margin-bottom:4px">✓ Expected: ${b.expected || '—'}</div>
+          <div style="font-size:12px;color:var(--red)">✗ Actual: ${b.actual || '—'}</div>
+        </div>
+      </div>
+      ${b.impact ? `<div style="margin-top:10px"><div class="bug-section-title">Impact</div><div class="bug-section-body">${b.impact}</div></div>` : ''}
+    </div>`).join('');
+}
+
+// ── Export ────────────────────────────────────────────────────────────────────
+function exportCSV() {
+  if (!testCases.length) { showToast('No test cases to export', 'err'); return; }
+  const headers = ['TC ID','Title','Module','Feature','Type','Priority','Objective','Prerequisites','Test Data','Steps','Expected Result','Status','Remarks'];
+  const rows = testCases.map(tc => [
+    tc.id, tc.title, tc.module||'', tc.feature||'', tc.type||'Functional',
+    tc.priority, tc.objective||'', tc.prerequisites||'',
+    tc.testData||'',
+    (tc.steps||[]).map((s,i)=>`${i+1}. ${s.action} → ${s.expected}`).join(' | '),
+    tc.expectedResult||'', tc.status, tc.remarks||''
+  ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(','));
+  const csv = [headers.join(','), ...rows].join('\n');
+  downloadBlob(csv, 'test-cases.csv', 'text/csv');
+  showToast('Exported CSV', 'ok');
+}
+
+function exportExcel() {
+  if (!testCases.length) { showToast('No test cases to export', 'err'); return; }
+  const wsData = [
+    ['TC ID','Title','Module','Feature','Type','Priority','Objective','Prerequisites','Test Data','Test Steps','Expected Result','Actual Result','Status','Remarks'],
+    ...testCases.map(tc => [
+      tc.id, tc.title, tc.module||'', tc.feature||'', tc.type||'Functional',
+      tc.priority, tc.objective||'', tc.prerequisites||'', tc.testData||'',
+      (tc.steps||[]).map((s,i)=>`Step ${i+1}: ${s.action}\nExpected: ${s.expected}`).join('\n\n'),
+      tc.expectedResult||'', tc.actualResult||'', tc.status, tc.remarks||''
+    ])
+  ];
+
+  const bugData = bugReports.length ? [
+    ['Bug ID','Title','Severity','Priority','Status','Module','Reporter','Date','Env','Build','Steps to Reproduce','Expected','Actual','Impact','TC Reference'],
+    ...bugReports.map(b => [
+      b.id, b.title, b.severity, b.priority, b.status,
+      b.module, b.reporter, b.date, b.env, b.build,
+      b.steps, b.expected, b.actual, b.impact, b.tcRef
+    ])
+  ] : [['No bugs reported']];
+
+  const wb = XLSX.utils.book_new();
+  const wsTC = XLSX.utils.aoa_to_sheet(wsData);
+  wsTC['!cols'] = [10,30,14,14,12,10,24,20,20,40,30,20,12,16].map(w=>({wch:w}));
+  XLSX.utils.book_append_sheet(wb, wsTC, 'Test Cases');
+  const wsBug = XLSX.utils.aoa_to_sheet(bugData);
+  XLSX.utils.book_append_sheet(wb, wsBug, 'Bug Reports');
+
+  const proj = document.getElementById('opt-project').value || 'TestCases';
+  XLSX.writeFile(wb, `${proj}_ISTQB_TestCases.xlsx`);
+  showToast('Exported Excel with Bug Reports sheet', 'ok');
+}
+
+function exportBugPDF() {
+  const bug = {
+    id: document.getElementById('bug-id-display').textContent,
+    date: document.getElementById('bug-date').value,
+    tcRef: document.getElementById('bug-tc-ref').value,
+    reporter: document.getElementById('bug-reporter').value,
+    title: document.getElementById('bug-title').value,
+    severity: document.querySelector('input[name="bug-sev"]:checked')?.value || '—',
+    priority: document.getElementById('bug-priority').value,
+    status: document.getElementById('bug-status').value,
+    module: document.getElementById('bug-module').value,
+    assignee: document.getElementById('bug-assignee').value,
+    env: document.getElementById('bug-env').value,
+    build: document.getElementById('bug-build').value,
+    desc: document.getElementById('bug-desc').value,
+    steps: document.getElementById('bug-steps').value,
+    expected: document.getElementById('bug-expected').value,
+    actual: document.getElementById('bug-actual').value,
+    impact: document.getElementById('bug-impact').value,
+  };
+
+  const html = `<!DOCTYPE html><html><head><style>
+    body{font-family:Arial,sans-serif;margin:0;padding:0;color:#111}
+    .header{background:#C0392B;color:#fff;padding:24px 32px}
+    .header h1{font-size:24px;margin:0}
+    .header p{font-size:13px;margin:4px 0 0;opacity:0.85}
+    .body{padding:24px 32px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+    .field label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#888;font-weight:bold}
+    .field p{font-size:13px;margin:3px 0 0;border-bottom:1px solid #eee;padding-bottom:6px}
+    .section{margin-bottom:16px}
+    .section h3{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888;border-bottom:2px solid #C0392B;padding-bottom:4px;margin-bottom:8px}
+    .section p{font-size:13px;white-space:pre-wrap;line-height:1.6}
+    .badge{display:inline-block;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:bold;background:#FDECEA;color:#C0392B}
+  </style></head><body>
+    <div class="header"><h1>🐛 Bug Report — ${bug.id}</h1><p>${bug.title}</p></div>
+    <div class="body">
+      <div class="grid">
+        <div class="field"><label>Bug ID</label><p>${bug.id}</p></div>
+        <div class="field"><label>Date</label><p>${bug.date}</p></div>
+        <div class="field"><label>TC Reference</label><p>${bug.tcRef || '—'}</p></div>
+        <div class="field"><label>Reporter</label><p>${bug.reporter || '—'}</p></div>
+        <div class="field"><label>Severity</label><p><span class="badge">${bug.severity}</span></p></div>
+        <div class="field"><label>Priority</label><p>${bug.priority}</p></div>
+        <div class="field"><label>Module</label><p>${bug.module || '—'}</p></div>
+        <div class="field"><label>Assigned To</label><p>${bug.assignee || '—'}</p></div>
+        <div class="field"><label>Environment</label><p>${bug.env || '—'}</p></div>
+        <div class="field"><label>Build / Version</label><p>${bug.build || '—'}</p></div>
+      </div>
+      <div class="section"><h3>Description</h3><p>${bug.desc || '—'}</p></div>
+      <div class="section"><h3>Steps to Reproduce</h3><p>${bug.steps || '—'}</p></div>
+      <div class="section"><h3>Expected Result</h3><p>${bug.expected || '—'}</p></div>
+      <div class="section"><h3>Actual Result</h3><p>${bug.actual || '—'}</p></div>
+      ${bug.impact ? `<div class="section"><h3>Impact / Risk</h3><p>${bug.impact}</p></div>` : ''}
+    </div>
+  </body></html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(() => w.print(), 400);
+}
+
+function downloadBlob(content, filename, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type }));
+  a.download = filename;
+  a.click();
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function showToast(msg, type = 'ok') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast show ${type}`;
+  setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+// ── Close modal on overlay click ──────────────────────────────────────────────
+document.getElementById('bug-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeBugModal();
+});
+</script>
+</body>
+</html>
