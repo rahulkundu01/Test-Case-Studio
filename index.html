@@ -3,1581 +3,1761 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TestCase Studio — QA Intelligence Platform</title>
+<title>TestCase Studio Pro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
+/* ═══════════════════════════════════════════════════════════════════
+   DESIGN SYSTEM — Refined Industrial / QA Command Center
+═══════════════════════════════════════════════════════════════════ */
 :root {
-  --ink:       #0A0A0F;
-  --ink2:      #1A1A2E;
-  --ink3:      #2D2D44;
-  --mist:      #F4F2EE;
-  --mist2:     #ECEAE4;
-  --mist3:     #DDD9D0;
-  --gold:      #C8922A;
-  --gold-l:    #E8B24A;
-  --teal:      #1A7A72;
-  --teal-l:    #2AA89D;
-  --red:       #C0392B;
-  --red-l:     #E74C3C;
-  --green:     #1E7E44;
-  --green-l:   #27AE60;
-  --blue:      #1A4A8A;
-  --blue-l:    #2E6FBF;
-  --purple:    #5B2D8E;
-  --border:    #D8D4CC;
-  --shadow:    0 1px 3px rgba(10,10,15,0.08), 0 4px 16px rgba(10,10,15,0.06);
-  --shadow-lg: 0 8px 32px rgba(10,10,15,0.14), 0 2px 8px rgba(10,10,15,0.08);
-  --r:         10px;
-  --font-serif: 'Instrument Serif', Georgia, serif;
-  --font-body:  'Outfit', sans-serif;
-  --font-mono:  'DM Mono', monospace;
+  /* Core palette */
+  --ink:        #0D0F14;
+  --ink2:       #161A24;
+  --ink3:       #1E2430;
+  --ink4:       #252C3A;
+  --mist:       #F7F6F3;
+  --mist2:      #EEECEA;
+  --mist3:      #E2DFD9;
+  --white:      #FFFFFF;
+
+  /* Accent — amber/gold for ISTQB, blue for Jira */
+  --a1:         #E8A020;   /* amber */
+  --a1-d:       #C07A10;
+  --a1-l:       #FFC452;
+  --a2:         #1A65CC;   /* Jira blue */
+  --a2-d:       #0F4A9C;
+  --a2-l:       #4C8EF0;
+
+  /* Status */
+  --green:      #1A9456;
+  --green-l:    #22C975;
+  --red:        #CC2B1A;
+  --red-l:      #F04030;
+  --yellow:     #D4890A;
+  --purple:     #6B3FCC;
+  --teal:       #0E8A8A;
+
+  /* Active accent (switches with mode) */
+  --accent:     var(--a1);
+  --accent-d:   var(--a1-d);
+  --accent-l:   var(--a1-l);
+
+  --border:     #D8D5CF;
+  --border2:    #C4C0B8;
+
+  --shadow-sm:  0 1px 3px rgba(13,15,20,0.10), 0 1px 2px rgba(13,15,20,0.06);
+  --shadow:     0 4px 12px rgba(13,15,20,0.10), 0 2px 6px rgba(13,15,20,0.06);
+  --shadow-lg:  0 12px 40px rgba(13,15,20,0.16), 0 4px 12px rgba(13,15,20,0.08);
+
+  --r:    6px;
+  --r-lg: 10px;
+  --r-xl: 14px;
+
+  --font:  'Sora', sans-serif;
+  --mono:  'JetBrains Mono', monospace;
+  --serif: 'Fraunces', serif;
+}
+
+/* Jira mode overrides */
+body.jira-mode {
+  --accent:   var(--a2);
+  --accent-d: var(--a2-d);
+  --accent-l: var(--a2-l);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+html { font-size: 14px; scroll-behavior: smooth; }
 
 body {
+  font-family: var(--font);
   background: var(--mist);
   color: var(--ink);
-  font-family: var(--font-body);
   min-height: 100vh;
-  font-size: 14px;
-  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
 }
 
-/* ── Header ─────────────────────────────────────────────────────────────── */
-.header {
+/* ── Scrollbar ──────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--mist3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border2); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   TOPBAR
+═══════════════════════════════════════════════════════════════════ */
+.topbar {
   background: var(--ink);
-  color: var(--mist);
-  padding: 0 32px;
-  height: 60px;
+  height: 58px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  padding: 0 24px;
+  gap: 20px;
   position: sticky;
   top: 0;
-  z-index: 200;
+  z-index: 400;
+  border-bottom: 1px solid var(--ink4);
 }
 
-.logo {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-}
-
-.logo-mark {
-  font-family: var(--font-serif);
-  font-size: 22px;
-  color: var(--mist);
-  letter-spacing: -0.5px;
-}
-
-.logo-mark em {
-  color: var(--gold-l);
-  font-style: italic;
-}
-
-.logo-tag {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: #666;
-  padding: 2px 8px;
-  border: 1px solid #333;
-  border-radius: 3px;
-}
-
-.header-right {
+.brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
-.api-badge {
+.brand-mark {
+  width: 30px; height: 30px;
+  background: var(--accent);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif);
+  font-size: 16px;
+  color: var(--ink);
+  font-style: italic;
+  font-weight: 700;
+  transition: background 0.4s;
+}
+
+.brand-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -0.3px;
+}
+.brand-name span { color: var(--accent); transition: color 0.4s; }
+
+/* Mode toggle */
+.mode-toggle {
+  display: flex;
+  align-items: center;
+  background: var(--ink3);
+  border: 1px solid var(--ink4);
+  border-radius: 20px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.mode-btn {
+  padding: 5px 14px;
+  border-radius: 16px;
+  border: none;
+  background: none;
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  color: rgba(255,255,255,0.45);
+  transition: all 0.25s;
+  white-space: nowrap;
+}
+.mode-btn.active {
+  background: var(--accent);
+  color: var(--ink);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* AI source toggle */
+.source-toggle {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 6px;
+  background: var(--ink3);
+  border: 1px solid var(--ink4);
+  border-radius: 8px;
   padding: 6px 12px;
-}
-.api-badge label { font-size: 10px; color: #888; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
-.api-badge input { background: none; border: none; color: var(--mist); font-family: var(--font-mono); font-size: 12px; width: 200px; outline: none; }
-.api-dot { width: 7px; height: 7px; border-radius: 50%; background: #444; transition: all 0.3s; flex-shrink: 0; }
-.api-dot.on { background: var(--green-l); box-shadow: 0 0 8px var(--green-l); }
-
-/* ── Layout ─────────────────────────────────────────────────────────────── */
-.app {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  min-height: calc(100vh - 60px);
+  cursor: pointer;
+  position: relative;
 }
 
-/* ── Sidebar ─────────────────────────────────────────────────────────────── */
-.sidebar {
+.source-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.4); white-space: nowrap; }
+
+.toggle-switch {
+  width: 36px; height: 18px;
+  background: var(--ink4);
+  border-radius: 9px;
+  position: relative;
+  transition: background 0.25s;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  width: 14px; height: 14px;
   background: #fff;
+  border-radius: 50%;
+  top: 2px; left: 2px;
+  transition: transform 0.25s;
+}
+.toggle-switch.on { background: var(--green); }
+.toggle-switch.on::after { transform: translateX(18px); }
+
+.source-mode-lbl { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.6); white-space: nowrap; }
+
+/* API key */
+.api-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ink3);
+  border: 1px solid var(--ink4);
+  border-radius: 8px;
+  padding: 7px 13px;
+  transition: border-color 0.2s;
+  flex: 1;
+  max-width: 320px;
+}
+.api-pill:focus-within { border-color: var(--accent); }
+.api-pill.hidden { display: none; }
+.api-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.15); transition: all 0.3s; flex-shrink: 0; }
+.api-dot.live { background: var(--green-l); box-shadow: 0 0 7px var(--green-l); }
+.api-lbl { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.35); white-space: nowrap; }
+.api-pill input { background: none; border: none; color: #fff; font-family: var(--mono); font-size: 12px; width: 100%; outline: none; }
+.api-pill input::placeholder { color: rgba(255,255,255,0.2); }
+
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════════════════════════ */
+.layout {
+  display: grid;
+  grid-template-columns: 290px 1fr;
+  flex: 1;
+  min-height: 0;
+  height: calc(100vh - 58px);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════════════════════════════ */
+.sidebar {
+  background: var(--white);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  height: 100%;
 }
 
-.sidebar-section {
-  padding: 20px;
+.sb-section {
+  padding: 16px;
   border-bottom: 1px solid var(--mist2);
 }
+.sb-section:last-child { border-bottom: none; }
 
-.sidebar-section:last-child { border-bottom: none; }
-
-.section-title {
+.sb-label {
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: #999;
-  margin-bottom: 14px;
+  color: var(--border2);
+  margin-bottom: 12px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
-.section-title::after { content: ''; flex: 1; height: 1px; background: var(--mist2); }
 
-/* Document Upload Zone */
-.upload-zone {
+/* Upload */
+.drop-zone {
+  position: relative;
   border: 2px dashed var(--border);
-  border-radius: var(--r);
-  padding: 24px 16px;
+  border-radius: var(--r-lg);
+  padding: 18px 12px;
   text-align: center;
   cursor: pointer;
   transition: all 0.2s;
   background: var(--mist);
-  position: relative;
 }
-.upload-zone:hover, .upload-zone.drag { border-color: var(--gold); background: rgba(200,146,42,0.04); }
-.upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-.upload-icon { font-size: 28px; margin-bottom: 8px; display: block; }
-.upload-title { font-weight: 600; font-size: 13px; color: var(--ink); }
-.upload-sub { font-size: 11px; color: #999; margin-top: 4px; }
-.upload-formats { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
-.fmt-badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 3px; letter-spacing: 1px; }
-.fmt-pdf { background: #FDECEA; color: var(--red); }
-.fmt-doc { background: #E8EEF8; color: var(--blue); }
-.fmt-txt { background: #F0F0F0; color: #555; }
-.fmt-xls { background: #E6F4EA; color: var(--green); }
+.drop-zone:hover, .drop-zone.drag {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 5%, white);
+}
+.drop-zone input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+.dz-icon { font-size: 24px; }
+.dz-title { font-size: 13px; font-weight: 600; color: var(--ink); margin: 5px 0 2px; }
+.dz-sub { font-size: 11px; color: var(--border2); }
+.dz-formats { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+.dz-fmt { font-size: 9px; font-weight: 700; letter-spacing: 0.5px; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; }
+.fmt-pdf { background: #FDECEA; color: #C62828; }
+.fmt-doc { background: #E3F2FD; color: #1565C0; }
+.fmt-xls { background: #E8F5E9; color: #2E7D32; }
+.fmt-txt { background: var(--mist2); color: #666; }
 
-.uploaded-files { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
-.uploaded-file {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 10px; border-radius: 6px;
+.file-list { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+.file-item {
+  display: flex; align-items: center; gap: 7px;
+  padding: 6px 9px; border-radius: var(--r);
   background: var(--mist); border: 1px solid var(--border);
-  font-size: 12px;
+  font-size: 11px;
 }
-.uf-icon { font-size: 16px; flex-shrink: 0; }
-.uf-name { flex: 1; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.uf-size { color: #999; font-family: var(--font-mono); font-size: 10px; }
-.uf-remove { background: none; border: none; color: #ccc; cursor: pointer; font-size: 14px; padding: 0 2px; }
-.uf-remove:hover { color: var(--red); }
+.fi-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+.fi-rm { background: none; border: none; color: var(--border2); cursor: pointer; font-size: 13px; }
+.fi-rm:hover { color: var(--red); }
 
-/* Text paste area */
-.paste-area {
-  width: 100%; min-height: 100px; max-height: 200px;
+.paste-box {
+  width: 100%; min-height: 80px;
   background: var(--mist); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 10px 12px;
-  font-family: var(--font-body); font-size: 12px; color: var(--ink);
-  resize: vertical; outline: none; transition: border-color 0.2s;
-  line-height: 1.6;
+  border-radius: var(--r); padding: 9px 11px;
+  font-family: var(--font); font-size: 12px; color: var(--ink);
+  resize: vertical; outline: none; line-height: 1.6;
+  transition: border-color 0.2s;
 }
-.paste-area:focus { border-color: var(--gold); }
+.paste-box:focus { border-color: var(--accent); background: #fff; }
 
-/* Options */
-.opts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.opt-group label { display: block; font-size: 10px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-select, .text-input {
-  width: 100%; padding: 7px 10px;
+/* Form controls */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.fg-full { grid-column: 1 / -1; }
+
+.field label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--border2); margin-bottom: 3px; }
+.field input, .field select {
+  width: 100%; padding: 7px 9px;
   background: var(--mist); border: 1px solid var(--border);
-  border-radius: 6px; color: var(--ink);
-  font-family: var(--font-body); font-size: 12px;
-  outline: none; transition: border-color 0.2s; cursor: pointer;
+  border-radius: var(--r); color: var(--ink);
+  font-family: var(--font); font-size: 12px;
+  outline: none; transition: border-color 0.2s;
 }
-select:focus, .text-input:focus { border-color: var(--gold); }
-.text-input { cursor: text; }
+.field input:focus, .field select:focus { border-color: var(--accent); background: #fff; }
 
-.check-row {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 12px; color: #555; cursor: pointer; padding: 3px 0;
+.chk-row { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--ink3); cursor: pointer; padding: 3px 0; }
+.chk-row input { accent-color: var(--accent); cursor: pointer; width: 14px; height: 14px; }
+
+/* Stats */
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+.stat-cell {
+  background: var(--mist);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 10px 6px;
+  text-align: center;
 }
-.check-row input { accent-color: var(--teal); cursor: pointer; }
+.sc-num { font-size: 20px; font-weight: 700; font-family: var(--mono); line-height: 1; }
+.sc-lbl { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--border2); margin-top: 2px; }
 
-/* Generate button */
-.btn-generate {
-  width: 100%; padding: 13px;
-  background: var(--ink); color: var(--mist);
-  border: none; border-radius: var(--r);
-  font-family: var(--font-body); font-size: 14px; font-weight: 600;
+/* Gen button */
+.btn-gen {
+  width: 100%; padding: 12px;
+  background: var(--accent);
+  color: var(--ink);
+  border: none; border-radius: var(--r-lg);
+  font-family: var(--font); font-size: 14px; font-weight: 700;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
-  gap: 8px; transition: all 0.2s; letter-spacing: 0.2px;
+  gap: 8px; transition: all 0.2s;
+  letter-spacing: -0.2px;
   position: relative; overflow: hidden;
 }
-.btn-generate::before {
+.btn-gen::after {
   content: '';
   position: absolute; inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(200,146,42,0.15), transparent);
-  transform: translateX(-100%);
-  transition: transform 0.4s;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+  pointer-events: none;
 }
-.btn-generate:hover::before { transform: translateX(100%); }
-.btn-generate:hover { background: var(--ink2); }
-.btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn-generate .spin { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
-.btn-generate.loading .spin { display: block; }
-.btn-generate.loading .btn-lbl { display: none; }
+.btn-gen:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: var(--shadow); }
+.btn-gen:active { transform: none; }
+.btn-gen:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+.spin { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.2); border-top-color: var(--ink); border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+.btn-gen.loading .spin { display: block; }
+.btn-gen.loading .lbl { display: none; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Stats strip */
-.stats-strip {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 1px; background: var(--border);
-  border-radius: 8px; overflow: hidden;
-  margin-bottom: 12px;
+/* No-API mode button */
+.btn-noapi {
+  width: 100%; padding: 10px;
+  background: var(--mist);
+  color: var(--ink3);
+  border: 2px dashed var(--border2);
+  border-radius: var(--r-lg);
+  font-family: var(--font); font-size: 13px; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  gap: 8px; transition: all 0.2s; margin-top: 8px;
 }
-.stat-box { background: #fff; padding: 10px; text-align: center; }
-.stat-num { font-size: 22px; font-weight: 700; font-family: var(--font-serif); color: var(--ink); }
-.stat-lbl { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-top: 1px; }
+.btn-noapi:hover { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent) 5%, white); }
+.btn-noapi.hidden { display: none; }
 
-/* ── Main Panel ───────────────────────────────────────────────────────────── */
-.main-panel {
+/* ═══════════════════════════════════════════════════════════════════
+   MAIN PANEL
+═══════════════════════════════════════════════════════════════════ */
+.main {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  height: 100%;
 }
 
-/* Tab Bar */
-.tab-bar {
-  background: #fff;
+/* Tabbar */
+.tabbar {
+  background: var(--white);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
-  padding: 0 24px;
+  padding: 0 20px;
+  height: 46px;
   gap: 0;
-  position: sticky;
-  top: 60px;
-  z-index: 100;
+  flex-shrink: 0;
 }
 
-.tab-btn {
-  padding: 16px 20px;
-  border: none;
-  background: none;
-  font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 500;
-  color: #999;
-  cursor: pointer;
+.tab {
+  height: 46px; padding: 0 15px;
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600;
+  color: var(--border2); border: none; background: none;
   border-bottom: 2px solid transparent;
-  transition: all 0.15s;
-  display: flex;
-  align-items: center;
-  gap: 7px;
+  margin-bottom: -1px; cursor: pointer; transition: all 0.15s;
   white-space: nowrap;
 }
-.tab-btn:hover { color: var(--ink); }
-.tab-btn.active { color: var(--ink); border-bottom-color: var(--gold); }
+.tab:hover { color: var(--ink); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-.tab-badge {
+.tbadge {
   font-size: 10px; font-weight: 700;
-  padding: 1px 6px; border-radius: 10px;
-  background: var(--mist2); color: #777;
+  min-width: 18px; height: 18px; padding: 0 5px;
+  border-radius: 9px; background: var(--mist2); color: var(--border2);
+  display: inline-flex; align-items: center; justify-content: center;
 }
-.tab-btn.active .tab-badge { background: var(--gold); color: #fff; }
+.tab.active .tbadge { background: var(--accent); color: var(--ink); }
 
-.tab-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.tab-actions { margin-left: auto; display: flex; gap: 6px; align-items: center; }
 
-.btn-outline {
-  padding: 6px 14px; border-radius: 6px;
-  border: 1px solid var(--border); background: #fff;
-  font-family: var(--font-body); font-size: 12px; font-weight: 500;
-  color: var(--ink); cursor: pointer; transition: all 0.15s;
-  display: flex; align-items: center; gap: 6px;
+/* Buttons */
+.btn {
+  padding: 6px 13px; border-radius: var(--r);
+  font-family: var(--font); font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+  display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
 }
-.btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+.btn-ghost { border: 1px solid var(--border); background: var(--white); color: var(--ink3); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+.btn-solid { border: none; background: var(--accent); color: var(--ink); }
+.btn-solid:hover { filter: brightness(1.08); }
+.btn-red { border: 1px solid #FFBDAD; background: var(--white); color: var(--red); }
+.btn-red:hover { background: var(--red); color: #fff; border-color: var(--red); }
 
-.btn-filled {
-  padding: 6px 14px; border-radius: 6px;
-  border: none; background: var(--teal);
-  font-family: var(--font-body); font-size: 12px; font-weight: 600;
-  color: #fff; cursor: pointer; transition: all 0.15s;
-  display: flex; align-items: center; gap: 6px;
-}
-.btn-filled:hover { background: var(--teal-l); }
-
-.btn-danger {
-  padding: 6px 14px; border-radius: 6px;
-  border: 1px solid var(--red); background: #fff;
-  font-family: var(--font-body); font-size: 12px; font-weight: 600;
-  color: var(--red); cursor: pointer; transition: all 0.15s;
-  display: flex; align-items: center; gap: 6px;
-}
-.btn-danger:hover { background: var(--red); color: #fff; }
-
-/* ── Content area ────────────────────────────────────────────────────────── */
-.content-area { flex: 1; overflow-y: auto; padding: 24px; }
-
+/* Content */
+.content { flex: 1; overflow-y: auto; padding: 20px; }
 .view { display: none; }
 .view.active { display: block; }
 
-/* ── Empty State ─────────────────────────────────────────────────────────── */
-.empty-state {
+/* ═══════════════════════════════════════════════════════════════════
+   OVERVIEW
+═══════════════════════════════════════════════════════════════════ */
+.ov-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+.ov-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+.ov-num { font-family: var(--serif); font-size: 36px; line-height: 1; }
+.ov-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--border2); margin-top: 4px; }
+
+.ov-analysis {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+.ov-analysis h3 { font-family: var(--serif); font-size: 18px; margin-bottom: 10px; }
+.ov-analysis p { font-size: 13px; color: var(--ink3); line-height: 1.9; white-space: pre-wrap; }
+
+/* Empty state */
+.empty {
   display: flex; flex-direction: column; align-items: center;
-  justify-content: center; padding: 80px 40px; text-align: center; gap: 12px;
+  justify-content: center; padding: 60px 40px; text-align: center; gap: 10px;
 }
-.es-glyph { font-family: var(--font-serif); font-size: 72px; color: var(--mist3); line-height: 1; }
-.es-title { font-family: var(--font-serif); font-size: 28px; color: var(--ink2); }
-.es-sub { font-size: 13px; color: #999; max-width: 340px; line-height: 1.7; }
-.es-steps {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 16px; margin-top: 24px; width: 100%; max-width: 600px;
+.e-glyph { font-family: var(--serif); font-size: 64px; color: var(--mist3); font-style: italic; }
+.e-title { font-family: var(--serif); font-size: 26px; color: var(--ink2); }
+.e-sub { font-size: 13px; color: var(--border2); max-width: 340px; line-height: 1.7; }
+.how { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; max-width: 560px; }
+.how-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 14px; text-align: left; }
+.how-n { font-family: var(--mono); font-size: 20px; color: var(--accent); font-weight: 600; }
+.how-t { font-weight: 700; font-size: 13px; margin: 4px 0 2px; }
+.how-s { font-size: 11px; color: var(--border2); line-height: 1.5; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   ISTQB VIEW — Card-based test cases
+═══════════════════════════════════════════════════════════════════ */
+.istqb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 14px; }
+
+.tc-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s;
 }
-.es-step {
-  background: #fff; border: 1px solid var(--border); border-radius: var(--r);
-  padding: 16px; text-align: left;
+.tc-card:hover { box-shadow: var(--shadow); }
+
+.tc-card-top {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--mist2);
+  display: flex; gap: 10px; align-items: flex-start;
 }
-.es-step-num { font-family: var(--font-serif); font-size: 28px; color: var(--gold); }
-.es-step-title { font-weight: 600; font-size: 13px; margin: 4px 0 2px; }
-.es-step-sub { font-size: 11px; color: #999; }
+.tc-card-id { font-family: var(--mono); font-size: 10px; color: var(--accent); font-weight: 600; margin-bottom: 3px; }
+.tc-card-title { font-size: 14px; font-weight: 600; color: var(--ink); line-height: 1.35; flex: 1; }
+.tc-card-badges { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
 
-/* ── Test Case Table ─────────────────────────────────────────────────────── */
-.tc-table-wrap { overflow-x: auto; }
-
-.tc-table {
-  width: 100%; border-collapse: collapse;
-  background: #fff; border-radius: var(--r);
-  overflow: hidden; box-shadow: var(--shadow);
-  font-size: 13px;
+.badge {
+  display: inline-block; padding: 2px 8px;
+  border-radius: 4px; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap;
 }
+.b-critical { background: #FDECEA; color: #B71C1C; }
+.b-high     { background: #FFF8E1; color: #E65100; }
+.b-medium   { background: #E3F2FD; color: #0D47A1; }
+.b-low      { background: #E8F5E9; color: #1B5E20; }
+.b-type     { background: var(--mist2); color: var(--ink3); }
+.b-todo     { background: var(--mist2); color: var(--ink3); }
+.b-pass     { background: #E8F5E9; color: var(--green); }
+.b-fail     { background: #FDECEA; color: var(--red); }
+.b-blocked  { background: #FFF8E1; color: var(--yellow); }
 
-.tc-table thead tr { background: var(--ink); color: var(--mist); }
-.tc-table th {
-  padding: 12px 14px; text-align: left;
-  font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
-  white-space: nowrap;
-}
+.tc-card-body { padding: 12px 16px; font-size: 12px; }
+.tc-field { margin-bottom: 8px; }
+.tc-field-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--border2); margin-bottom: 3px; }
+.tc-field-val { font-size: 12px; color: var(--ink3); line-height: 1.6; }
 
-.tc-table tbody tr { border-bottom: 1px solid var(--mist2); transition: background 0.1s; }
-.tc-table tbody tr:hover { background: rgba(200,146,42,0.03); }
-.tc-table tbody tr:last-child { border-bottom: none; }
-
-.tc-table td { padding: 11px 14px; vertical-align: top; }
-
-.tc-id { font-family: var(--font-mono); font-size: 11px; color: #888; white-space: nowrap; }
-.tc-title-cell { font-weight: 600; color: var(--ink); min-width: 200px; }
-.tc-module { font-size: 11px; }
-
-.pri-badge {
-  display: inline-block; padding: 2px 8px; border-radius: 4px;
-  font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
-  white-space: nowrap;
-}
-.pri-critical { background: #FDECEA; color: var(--red); }
-.pri-high     { background: #FEF3E2; color: var(--gold); }
-.pri-medium   { background: #E8EEF8; color: var(--blue); }
-.pri-low      { background: #E6F4EA; color: var(--green); }
-
-.type-badge {
-  display: inline-block; padding: 2px 8px; border-radius: 4px;
-  font-size: 10px; font-weight: 600; background: var(--mist2); color: #555;
-}
-
-.status-badge {
-  display: inline-block; padding: 2px 8px; border-radius: 4px;
-  font-size: 10px; font-weight: 600;
-}
-.status-not-run  { background: var(--mist2); color: #777; }
-.status-pass     { background: #E6F4EA; color: var(--green); }
-.status-fail     { background: #FDECEA; color: var(--red); }
-.status-blocked  { background: #FEF3E2; color: var(--gold); }
-
-.steps-cell { font-size: 12px; color: #555; min-width: 180px; max-width: 280px; line-height: 1.7; }
-.expected-cell { font-size: 12px; color: var(--teal); min-width: 150px; max-width: 220px; line-height: 1.7; }
-
-.cell-actions { display: flex; gap: 4px; }
-.tc-action-btn {
-  padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border);
-  background: #fff; font-size: 10px; font-weight: 600;
-  cursor: pointer; transition: all 0.15s; white-space: nowrap;
-}
-.tc-action-btn:hover { border-color: var(--gold); color: var(--gold); }
-.tc-action-btn.bug { border-color: var(--red-l); color: var(--red); }
-.tc-action-btn.bug:hover { background: var(--red); color: #fff; }
-
-.status-select {
-  padding: 3px 6px; border-radius: 4px; border: 1px solid var(--border);
-  background: #fff; font-size: 11px; font-family: var(--font-body);
-  outline: none; cursor: pointer; color: var(--ink);
-}
-
-/* ── Test Case Detail ────────────────────────────────────────────────────── */
-.tc-detail-card {
-  background: #fff; border: 1px solid var(--border);
-  border-radius: var(--r); margin-bottom: 16px;
-  box-shadow: var(--shadow); overflow: hidden;
-}
-.tc-detail-header {
-  background: var(--ink); color: var(--mist);
-  padding: 16px 20px; display: flex; align-items: flex-start; justify-content: space-between;
-}
-.tc-detail-id { font-family: var(--font-mono); font-size: 11px; color: var(--gold-l); margin-bottom: 4px; }
-.tc-detail-title { font-family: var(--font-serif); font-size: 20px; line-height: 1.3; }
-.tc-detail-meta { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-
-.tc-detail-body { padding: 20px; }
-.tc-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-.tc-detail-field label { font-size: 10px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; display: block; }
-.tc-detail-field p { font-size: 13px; color: var(--ink); }
-
-.steps-list { list-style: none; }
-.step-item {
-  display: flex; gap: 12px; padding: 10px 0;
+.steps-ol { list-style: none; margin-top: 4px; }
+.step-li {
+  display: flex; gap: 10px; padding: 7px 0;
   border-bottom: 1px solid var(--mist2);
 }
-.step-item:last-child { border-bottom: none; }
-.step-num {
-  width: 24px; height: 24px; border-radius: 50%;
-  background: var(--ink); color: var(--mist);
+.step-li:last-child { border-bottom: none; }
+.step-n {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--accent); color: var(--ink);
   display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700; flex-shrink: 0;
+  font-size: 9px; font-weight: 700; flex-shrink: 0; margin-top: 1px;
 }
-.step-content { flex: 1; }
-.step-action { font-size: 13px; font-weight: 500; color: var(--ink); }
-.step-expected { font-size: 12px; color: var(--teal); margin-top: 2px; }
-.step-expected::before { content: '→ '; font-weight: 600; }
+.step-body { flex: 1; }
+.step-action { font-size: 12px; font-weight: 500; color: var(--ink); }
+.step-exp { font-size: 11px; color: var(--green); margin-top: 2px; }
+.step-exp::before { content: '→ '; font-weight: 700; }
 
-/* ── Bug Report Modal ────────────────────────────────────────────────────── */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(10,10,15,0.6);
-  z-index: 1000; display: flex; align-items: center; justify-content: center;
-  padding: 20px; backdrop-filter: blur(4px);
-  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+.tc-expected {
+  background: color-mix(in srgb, var(--green) 8%, white);
+  border: 1px solid color-mix(in srgb, var(--green) 25%, white);
+  border-radius: var(--r); padding: 9px 12px;
+  font-size: 12px; color: var(--green); line-height: 1.6; margin-top: 10px;
 }
-.modal-overlay.open { opacity: 1; pointer-events: all; }
+.tc-expected::before { content: '✓ Expected · '; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.tc-card-foot {
+  padding: 10px 16px; border-top: 1px solid var(--mist2);
+  background: var(--mist);
+  display: flex; align-items: center; gap: 6px;
+}
+
+.status-select {
+  padding: 4px 8px; border-radius: 4px;
+  border: 1px solid var(--border); background: var(--white);
+  font-family: var(--font); font-size: 11px; color: var(--ink);
+  outline: none; cursor: pointer;
+}
+
+.tc-btn {
+  padding: 4px 10px; border-radius: 4px;
+  border: 1px solid var(--border); background: var(--white);
+  font-size: 10px; font-weight: 700; cursor: pointer;
+  transition: all 0.12s; color: var(--ink3);
+}
+.tc-btn:hover { border-color: var(--accent); color: var(--accent); }
+.tc-btn.bug { border-color: #FFBDAD; color: var(--red); }
+.tc-btn.bug:hover { background: var(--red); color: #fff; border-color: var(--red); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   JIRA VIEW — Table backlog
+═══════════════════════════════════════════════════════════════════ */
+.jira-filters { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+.ji-search {
+  padding: 7px 11px; border-radius: var(--r);
+  border: 1px solid var(--border); background: var(--white);
+  font-family: var(--font); font-size: 12px; color: var(--ink);
+  outline: none; width: 200px; transition: border-color 0.2s;
+}
+.ji-search:focus { border-color: var(--accent); }
+.ji-sel {
+  padding: 7px 10px; border-radius: var(--r);
+  border: 1px solid var(--border); background: var(--white);
+  font-family: var(--font); font-size: 12px; color: var(--ink3);
+  outline: none; cursor: pointer;
+}
+
+.jira-wrap { overflow-x: auto; border-radius: var(--r-lg); box-shadow: var(--shadow-sm); }
+.jira-tbl {
+  width: 100%; border-collapse: collapse;
+  background: var(--white); font-size: 12px;
+}
+.jira-tbl thead { background: var(--mist); border-bottom: 2px solid var(--border); }
+.jira-tbl th {
+  padding: 10px 12px; text-align: left;
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.8px; color: var(--border2); white-space: nowrap;
+}
+.jira-tbl tbody tr { border-bottom: 1px solid var(--mist2); transition: background 0.1s; }
+.jira-tbl tbody tr:last-child { border-bottom: none; }
+.jira-tbl tbody tr:hover { background: color-mix(in srgb, var(--accent) 4%, white); }
+.jira-tbl td { padding: 10px 12px; vertical-align: middle; }
+
+.j-key { font-family: var(--mono); font-size: 11px; color: var(--accent); font-weight: 600; white-space: nowrap; }
+.j-summary { font-weight: 600; color: var(--ink); }
+.j-summary small { display: block; font-size: 11px; color: var(--border2); font-weight: 400; margin-top: 1px; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   BUG LIST
+═══════════════════════════════════════════════════════════════════ */
+.bug-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+.bug-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s;
+}
+.bug-card:hover { box-shadow: var(--shadow); }
+.bug-stripe { height: 4px; }
+.bs-Critical { background: var(--red); }
+.bs-High     { background: var(--yellow); }
+.bs-Medium   { background: var(--accent); }
+.bs-Low      { background: var(--green); }
+.bug-body { padding: 14px 16px; }
+.bug-key { font-family: var(--mono); font-size: 10px; color: var(--red); font-weight: 600; }
+.bug-title { font-size: 14px; font-weight: 600; color: var(--ink); margin: 4px 0 10px; line-height: 1.35; }
+.bug-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+.bug-section { padding-top: 10px; border-top: 1px solid var(--mist2); margin-top: 10px; }
+.bug-section-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--border2); margin-bottom: 4px; }
+.bug-section-val { font-size: 12px; color: var(--ink3); line-height: 1.7; white-space: pre-wrap; }
+.bug-exp-act { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+.bea-box { padding: 8px 10px; border-radius: var(--r); font-size: 11px; line-height: 1.6; }
+.bea-exp { background: #E8F5E9; color: var(--green); }
+.bea-act { background: #FDECEA; color: var(--red); }
+.bug-foot { padding: 10px 16px; border-top: 1px solid var(--mist2); background: var(--mist); display: flex; gap: 6px; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   BUG MODAL
+═══════════════════════════════════════════════════════════════════ */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(13,15,20,0.6);
+  z-index: 600;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+  backdrop-filter: blur(3px);
+}
+.overlay.open { opacity: 1; pointer-events: all; }
 
 .modal {
-  background: #fff; border-radius: 14px;
-  width: 100%; max-width: 680px; max-height: 90vh;
-  overflow-y: auto; box-shadow: var(--shadow-lg);
-  transform: translateY(16px) scale(0.98);
+  background: var(--white);
+  border-radius: var(--r-xl);
+  width: 100%; max-width: 740px;
+  max-height: 92vh; overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(14px) scale(0.98);
   transition: transform 0.25s ease;
 }
-.modal-overlay.open .modal { transform: none; }
+.overlay.open .modal { transform: none; }
 
-.modal-header {
-  background: var(--red); color: #fff;
-  padding: 20px 24px; border-radius: 14px 14px 0 0;
-  display: flex; align-items: flex-start; justify-content: space-between;
+.modal-head {
+  background: linear-gradient(135deg, var(--red) 0%, var(--red-l) 100%);
+  padding: 22px 26px;
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  position: relative;
 }
-.modal-title { font-family: var(--font-serif); font-size: 22px; }
-.modal-subtitle { font-size: 12px; opacity: 0.85; margin-top: 3px; }
-.modal-close { background: none; border: none; color: rgba(255,255,255,0.7); font-size: 20px; cursor: pointer; }
+.modal-head-eyebrow { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.6); margin-bottom: 6px; }
+.modal-head-title { font-family: var(--serif); font-size: 22px; color: #fff; font-weight: 700; }
+.modal-head-id {
+  position: absolute; top: 22px; right: 54px;
+  font-family: var(--mono); font-size: 12px; font-weight: 600;
+  background: rgba(255,255,255,0.18); padding: 3px 12px; border-radius: 20px; color: #fff;
+}
+.modal-close { position: absolute; top: 20px; right: 22px; background: none; border: none; color: rgba(255,255,255,0.6); font-size: 20px; cursor: pointer; line-height: 1; }
 .modal-close:hover { color: #fff; }
 
-.modal-body { padding: 24px; }
+.modal-body { padding: 22px 26px; }
 
-.bug-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.bug-field { display: flex; flex-direction: column; gap: 5px; }
-.bug-field.full { grid-column: 1 / -1; }
-.bug-field label { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
-.bug-field input, .bug-field select, .bug-field textarea {
-  padding: 9px 12px;
-  border: 1px solid var(--border); border-radius: 7px;
-  background: var(--mist); color: var(--ink);
-  font-family: var(--font-body); font-size: 13px;
-  outline: none; transition: border-color 0.2s;
-  resize: vertical;
+/* Email panel */
+.email-panel {
+  background: #EBF5FF;
+  border: 1px solid #BDDEFF;
+  border-radius: var(--r-lg);
+  padding: 14px 16px;
+  margin-bottom: 18px;
 }
-.bug-field input:focus, .bug-field select:focus, .bug-field textarea:focus { border-color: var(--red-l); }
+.ep-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--a2); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.ep-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ep-grid input {
+  padding: 7px 10px;
+  border: 1px solid #BDDEFF; border-radius: var(--r-sm);
+  background: #fff; font-family: var(--font); font-size: 12px;
+  color: var(--ink); outline: none; width: 100%; transition: border-color 0.2s;
+}
+.ep-grid input:focus { border-color: var(--a2); }
+.ep-full { grid-column: 1 / -1; }
 
-.severity-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-.sev-opt { display: none; }
+/* Modal form */
+.m-section { margin-bottom: 18px; }
+.m-section-title {
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+  color: var(--border2); border-bottom: 1px solid var(--mist2);
+  padding-bottom: 6px; margin-bottom: 12px;
+}
+.m-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.mf { display: flex; flex-direction: column; gap: 4px; }
+.mf-full { grid-column: 1 / -1; }
+.mf label { font-size: 11px; font-weight: 700; color: var(--ink3); }
+.mf input, .mf select, .mf textarea {
+  padding: 8px 11px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r); background: var(--mist);
+  color: var(--ink); font-family: var(--font); font-size: 13px;
+  outline: none; transition: border-color 0.2s; resize: vertical;
+}
+.mf input:focus, .mf select:focus, .mf textarea:focus { border-color: var(--red-l); background: #fff; }
+
+/* Severity grid */
+.sev-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.sev-radio { display: none; }
 .sev-lbl {
-  padding: 7px 4px; border-radius: 6px; border: 1px solid var(--border);
-  text-align: center; font-size: 11px; font-weight: 600; cursor: pointer;
-  transition: all 0.15s;
+  display: block; padding: 8px 4px;
+  border-radius: var(--r); border: 2px solid var(--border);
+  text-align: center; font-size: 11px; font-weight: 700;
+  cursor: pointer; transition: all 0.15s;
+  color: var(--border2);
 }
-.sev-opt:checked + .sev-lbl { border-color: var(--red); color: var(--red); background: rgba(192,57,43,0.08); }
-.sev-critical + .sev-lbl { color: var(--red); }
-.sev-high + .sev-lbl { color: var(--gold); }
-.sev-medium + .sev-lbl { color: var(--blue); }
-.sev-low + .sev-lbl { color: var(--green); }
+.sr-crit:checked + .sev-lbl { border-color: var(--red); background: #FDECEA; color: var(--red); }
+.sr-high:checked + .sev-lbl { border-color: var(--yellow); background: #FFF8E1; color: var(--yellow); }
+.sr-med:checked  + .sev-lbl { border-color: var(--a2); background: #E3F2FD; color: var(--a2); }
+.sr-low:checked  + .sev-lbl { border-color: var(--green); background: #E8F5E9; color: var(--green); }
 
-.bug-id-display {
-  font-family: var(--font-mono); font-size: 13px; font-weight: 500;
-  padding: 9px 12px; background: var(--mist2); border-radius: 7px;
-  color: var(--ink); border: 1px solid var(--border);
+.modal-foot {
+  padding: 14px 26px;
+  border-top: 1px solid var(--mist2);
+  display: flex; gap: 8px; justify-content: flex-end; align-items: center;
+  background: var(--mist);
+  border-radius: 0 0 var(--r-xl) var(--r-xl);
 }
+.mf-note { flex: 1; font-size: 11px; color: var(--border2); }
 
-.modal-footer { padding: 16px 24px; border-top: 1px solid var(--mist2); display: flex; gap: 8px; justify-content: flex-end; }
-
-/* ── Bug List ─────────────────────────────────────────────────────────────── */
-.bug-card {
-  background: #fff; border: 1px solid var(--border);
-  border-left: 4px solid var(--red); border-radius: var(--r);
-  padding: 16px 20px; margin-bottom: 12px;
-  box-shadow: var(--shadow);
-}
-.bug-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
-.bug-card-id { font-family: var(--font-mono); font-size: 11px; color: #999; }
-.bug-card-title { font-weight: 600; font-size: 14px; color: var(--ink); margin-top: 2px; }
-.bug-card-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; font-size: 11px; color: #777; align-items: center; }
-.bug-card-meta span { display: flex; align-items: center; gap: 3px; }
-
-.bug-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #999; margin-bottom: 4px; }
-.bug-section-body { font-size: 12px; color: #555; line-height: 1.7; white-space: pre-wrap; }
-.bug-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
-
-/* ── Progress / Chat ─────────────────────────────────────────────────────── */
-.gen-progress {
-  background: var(--ink); color: var(--mist);
-  border-radius: var(--r); padding: 20px 24px; margin-bottom: 20px;
-  display: none;
-}
-.gen-progress.show { display: block; }
-.progress-title { font-family: var(--font-mono); font-size: 12px; color: var(--gold-l); margin-bottom: 8px; }
-.progress-log { font-family: var(--font-mono); font-size: 12px; line-height: 1.8; max-height: 120px; overflow-y: auto; }
-.progress-log .line { opacity: 0; animation: fadein 0.3s forwards; }
-@keyframes fadein { to { opacity: 1; } }
-
-/* ── Filters ─────────────────────────────────────────────────────────────── */
-.filters-bar {
-  display: flex; gap: 8px; flex-wrap: wrap;
-  padding: 14px 24px; background: #fff; border-bottom: 1px solid var(--border);
-}
-.filter-chip {
-  padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border);
-  background: #fff; font-size: 11px; font-weight: 600; cursor: pointer;
-  transition: all 0.15s; color: #777;
-}
-.filter-chip.active { background: var(--ink); color: var(--mist); border-color: var(--ink); }
-.filter-chip:hover:not(.active) { border-color: var(--gold); color: var(--gold); }
-
-/* ── Toast ────────────────────────────────────────────────────────────────── */
-.toast {
-  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
-  padding: 12px 18px; border-radius: var(--r);
-  background: var(--ink); color: var(--mist); font-size: 13px;
-  box-shadow: var(--shadow-lg); transform: translateY(20px);
-  opacity: 0; transition: all 0.25s; pointer-events: none;
+/* ═══════════════════════════════════════════════════════════════════
+   NO-API PROMPT MODAL
+═══════════════════════════════════════════════════════════════════ */
+.prompt-modal-body { padding: 22px 26px; }
+.prompt-steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 18px; }
+.ps { background: var(--mist); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 12px; text-align: center; }
+.ps-n { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--accent); }
+.ps-t { font-size: 12px; font-weight: 700; margin: 4px 0 2px; }
+.ps-s { font-size: 11px; color: var(--border2); }
+.ai-links { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.ai-link {
   display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; border-radius: var(--r-lg);
+  border: 1px solid var(--border); background: var(--white);
+  text-decoration: none; color: var(--ink); font-size: 12px; font-weight: 600;
+  transition: all 0.15s; cursor: pointer;
 }
-.toast.show { opacity: 1; transform: translateY(0); }
-.toast.ok { border-left: 3px solid var(--green-l); }
-.toast.err { border-left: 3px solid var(--red-l); }
+.ai-link:hover { border-color: var(--accent); color: var(--accent); }
+.ai-link-icon { font-size: 20px; }
 
-/* ── Scrollbar ────────────────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.prompt-box {
+  width: 100%; min-height: 260px;
+  background: var(--ink); color: #A8FF78;
+  font-family: var(--mono); font-size: 12px; line-height: 1.7;
+  border-radius: var(--r-lg); padding: 16px 18px;
+  border: none; outline: none; resize: vertical;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PROGRESS
+═══════════════════════════════════════════════════════════════════ */
+.progress-box {
+  background: var(--ink2); border-radius: var(--r-lg);
+  padding: 14px 18px; margin-bottom: 16px; display: none;
+  font-family: var(--mono); font-size: 12px;
+}
+.progress-box.show { display: block; }
+.pb-title { color: var(--accent); font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+.pb-log { color: #7EE8A2; line-height: 2.1; max-height: 110px; overflow-y: auto; }
+.pb-line { opacity: 0; animation: fadeIn 0.3s forwards; }
+@keyframes fadeIn { to { opacity: 1; } }
+
+/* ═══════════════════════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════════════════════ */
+.toast {
+  position: fixed; bottom: 20px; right: 20px; z-index: 999;
+  padding: 11px 18px; border-radius: var(--r-lg);
+  background: var(--ink); color: #fff; font-size: 13px; font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  opacity: 0; transform: translateY(10px);
+  transition: all 0.25s; pointer-events: none;
+  display: flex; align-items: center; gap: 8px; max-width: 360px;
+}
+.toast.show { opacity: 1; transform: none; }
+.toast.ok  { border-left: 3px solid var(--green-l); }
+.toast.err { border-left: 3px solid var(--red-l); }
+.toast.info{ border-left: 3px solid var(--accent); }
 </style>
 </head>
 <body>
 
-<!-- Header -->
-<header class="header">
-  <div class="logo">
-    <div class="logo-mark">Test<em>Case</em> Studio</div>
-    <div class="logo-tag">ISTQB Standard</div>
+<!-- ══ TOPBAR ══════════════════════════════════════════════════════════════ -->
+<nav class="topbar">
+  <div class="brand">
+    <div class="brand-mark" id="brand-mark">T</div>
+    <div class="brand-name">TestCase<span id="brand-span"> Studio</span></div>
   </div>
-  <div class="header-right">
-    <div class="api-badge">
-      <div class="api-dot" id="api-dot"></div>
-      <label>API KEY</label>
-      <input type="password" id="api-key" placeholder="sk-ant-..." autocomplete="off">
-    </div>
+
+  <!-- Mode toggle -->
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="btn-istqb" onclick="setMode('istqb')">📋 ISTQB</button>
+    <button class="mode-btn"        id="btn-jira"  onclick="setMode('jira')">🔵 Jira-Style</button>
   </div>
-</header>
 
-<!-- App -->
-<div class="app">
+  <!-- AI Source toggle -->
+  <div class="source-toggle" onclick="toggleSource()">
+    <span class="source-label">AI Source</span>
+    <div class="toggle-switch" id="src-toggle"></div>
+    <span class="source-mode-lbl" id="src-lbl">Manual (No API)</span>
+  </div>
 
-  <!-- Sidebar -->
+  <!-- API key (shown when API mode) -->
+  <div class="api-pill hidden" id="api-pill">
+    <div class="api-dot" id="api-dot"></div>
+    <span class="api-lbl">Key</span>
+    <input type="password" id="api-key" placeholder="sk-ant-api03-..." autocomplete="off">
+  </div>
+
+  <div class="topbar-right">
+    <span id="nav-project" style="font-size:12px;color:rgba(255,255,255,0.4)">No project loaded</span>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- ══ SIDEBAR ═══════════════════════════════════════════════════════════ -->
   <aside class="sidebar">
 
     <!-- Upload -->
-    <div class="sidebar-section">
-      <div class="section-title">Documents</div>
-
-      <div class="upload-zone" id="drop-zone">
+    <div class="sb-section">
+      <div class="sb-label">📂 Documents</div>
+      <div class="drop-zone" id="drop-zone">
         <input type="file" id="file-input" multiple accept=".pdf,.doc,.docx,.txt,.xls,.xlsx,.csv">
-        <span class="upload-icon">📂</span>
-        <div class="upload-title">Drop documents here</div>
-        <div class="upload-sub">or click to browse</div>
-        <div class="upload-formats">
-          <span class="fmt-badge fmt-pdf">PDF</span>
-          <span class="fmt-badge fmt-doc">DOCX</span>
-          <span class="fmt-badge fmt-xls">XLSX</span>
-          <span class="fmt-badge fmt-txt">TXT</span>
-          <span class="fmt-badge fmt-txt">CSV</span>
+        <div class="dz-icon">📁</div>
+        <div class="dz-title">Drop files or click</div>
+        <div class="dz-sub">BRS · FRS · Test Plans</div>
+        <div class="dz-formats">
+          <span class="dz-fmt fmt-pdf">PDF</span>
+          <span class="dz-fmt fmt-doc">DOCX</span>
+          <span class="dz-fmt fmt-xls">XLSX</span>
+          <span class="dz-fmt fmt-txt">TXT CSV</span>
         </div>
       </div>
-      <div class="uploaded-files" id="uploaded-files"></div>
-
-      <div style="margin-top:12px">
-        <div style="font-size:11px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Or paste content</div>
-        <textarea class="paste-area" id="paste-area" placeholder="Paste BRS, FRS or test plan content here..."></textarea>
+      <div class="file-list" id="file-list"></div>
+      <div style="margin-top:10px">
+        <div class="sb-label" style="margin-bottom:5px">Or Paste Text</div>
+        <textarea class="paste-box" id="paste-content" placeholder="Paste BRS, FRS, requirements or test plan content here..."></textarea>
       </div>
     </div>
 
-    <!-- Options -->
-    <div class="sidebar-section">
-      <div class="section-title">Configuration</div>
-      <div class="opts-grid">
-        <div class="opt-group">
-          <label>Project Name</label>
-          <input type="text" class="text-input" id="opt-project" placeholder="My Project">
-        </div>
-        <div class="opt-group">
-          <label>Module</label>
-          <input type="text" class="text-input" id="opt-module" placeholder="e.g. Login">
-        </div>
-        <div class="opt-group">
-          <label>Version</label>
-          <input type="text" class="text-input" id="opt-version" placeholder="v1.0">
-        </div>
-        <div class="opt-group">
-          <label>Prepared By</label>
-          <input type="text" class="text-input" id="opt-author" placeholder="QA Engineer">
-        </div>
-        <div class="opt-group">
-          <label>Test Type</label>
-          <select id="opt-type">
-            <option>Functional</option>
-            <option>Integration</option>
-            <option>Regression</option>
-            <option>UAT</option>
-            <option>Smoke</option>
+    <!-- Config -->
+    <div class="sb-section">
+      <div class="sb-label">⚙ Configuration</div>
+      <div class="form-grid">
+        <div class="field fg-full"><label>Project Name</label><input type="text" id="cfg-project" placeholder="My QA Project"></div>
+        <div class="field"><label>Module / Epic</label><input type="text" id="cfg-module" placeholder="Login"></div>
+        <div class="field"><label>Version</label><input type="text" id="cfg-version" placeholder="v1.0"></div>
+        <div class="field"><label>Author / QA</label><input type="text" id="cfg-author" placeholder="QA Engineer"></div>
+        <div class="field"><label>Test Type</label>
+          <select id="cfg-type">
+            <option>Functional</option><option>Integration</option>
+            <option>Regression</option><option>UAT</option>
+            <option>Smoke</option><option>Security</option>
           </select>
         </div>
-        <div class="opt-group">
-          <label>Priority Focus</label>
-          <select id="opt-priority">
-            <option value="all">All Priorities</option>
-            <option value="critical">Critical Only</option>
-            <option value="high">High & Critical</option>
-            <option value="medium">Medium+</option>
+        <div class="field"><label>Priority</label>
+          <select id="cfg-priority">
+            <option value="all">All</option><option value="critical">Critical</option>
+            <option value="high">High+</option>
           </select>
         </div>
       </div>
-      <div style="margin-top:10px;display:flex;flex-direction:column;gap:5px">
-        <label class="check-row"><input type="checkbox" id="chk-edge" checked> Include edge cases</label>
-        <label class="check-row"><input type="checkbox" id="chk-neg" checked> Include negative tests</label>
-        <label class="check-row"><input type="checkbox" id="chk-data"> Include test data examples</label>
-        <label class="check-row"><input type="checkbox" id="chk-api"> Include API test cases</label>
-        <label class="check-row"><input type="checkbox" id="chk-prereq"> List prerequisites per test</label>
+      <div style="margin-top:10px;display:flex;flex-direction:column;gap:4px">
+        <label class="chk-row"><input type="checkbox" id="chk-edge" checked> Edge cases</label>
+        <label class="chk-row"><input type="checkbox" id="chk-neg"  checked> Negative tests</label>
+        <label class="chk-row"><input type="checkbox" id="chk-data"> Test data examples</label>
+        <label class="chk-row"><input type="checkbox" id="chk-api">  API test cases</label>
       </div>
+    </div>
+
+    <!-- Email defaults -->
+    <div class="sb-section">
+      <div class="sb-label">📧 Email Defaults</div>
+      <div class="field" style="margin-bottom:7px"><label>Bug Reports To</label><input type="email" id="def-to" placeholder="dev@company.com"></div>
+      <div class="field"><label>CC</label><input type="email" id="def-cc" placeholder="qa-lead@company.com"></div>
     </div>
 
     <!-- Stats -->
-    <div class="sidebar-section">
-      <div class="section-title">Summary</div>
-      <div class="stats-strip">
-        <div class="stat-box"><div class="stat-num" id="stat-total">0</div><div class="stat-lbl">Total TCs</div></div>
-        <div class="stat-box"><div class="stat-num" id="stat-pass" style="color:var(--green)">0</div><div class="stat-lbl">Pass</div></div>
-        <div class="stat-box"><div class="stat-num" id="stat-fail" style="color:var(--red)">0</div><div class="stat-lbl">Fail</div></div>
+    <div class="sb-section">
+      <div class="sb-label">📊 Stats</div>
+      <div class="stats-grid" style="margin-bottom:6px">
+        <div class="stat-cell"><div class="sc-num" id="st-total">0</div><div class="sc-lbl">Total</div></div>
+        <div class="stat-cell"><div class="sc-num" style="color:var(--green)" id="st-pass">0</div><div class="sc-lbl">Pass</div></div>
+        <div class="stat-cell"><div class="sc-num" style="color:var(--red)" id="st-fail">0</div><div class="sc-lbl">Fail</div></div>
       </div>
-      <div class="stats-strip" style="margin-top:1px">
-        <div class="stat-box"><div class="stat-num" id="stat-bugs" style="color:var(--red)">0</div><div class="stat-lbl">Bugs</div></div>
-        <div class="stat-box"><div class="stat-num" id="stat-critical" style="color:var(--gold)">0</div><div class="stat-lbl">Critical</div></div>
-        <div class="stat-box"><div class="stat-num" id="stat-notrun" style="color:#999">0</div><div class="stat-lbl">Not Run</div></div>
+      <div class="stats-grid">
+        <div class="stat-cell"><div class="sc-num" style="color:var(--red)" id="st-bugs">0</div><div class="sc-lbl">Bugs</div></div>
+        <div class="stat-cell"><div class="sc-num" style="color:var(--yellow)" id="st-crit">0</div><div class="sc-lbl">Critical</div></div>
+        <div class="stat-cell"><div class="sc-num" style="color:var(--border2)" id="st-notrun">0</div><div class="sc-lbl">Not Run</div></div>
       </div>
     </div>
 
     <!-- Generate -->
-    <div class="sidebar-section">
-      <button class="btn-generate" id="btn-generate" onclick="generateTestCases()">
+    <div class="sb-section">
+      <button class="btn-gen" id="btn-gen" onclick="generate()">
         <div class="spin"></div>
-        <span class="btn-lbl">✦ Generate Test Cases</span>
+        <span class="lbl">⚡ Generate Test Cases</span>
+      </button>
+      <button class="btn-noapi" id="btn-noapi" onclick="openPromptModal()">
+        📋 Generate Prompt (No API)
       </button>
     </div>
 
   </aside>
 
-  <!-- Main Panel -->
-  <main class="main-panel">
-
-    <!-- Tab Bar -->
-    <div class="tab-bar">
-      <button class="tab-btn active" onclick="switchTab('overview', this)">📋 Overview</button>
-      <button class="tab-btn" onclick="switchTab('table', this)">⊞ Test Cases <span class="tab-badge" id="tc-count">0</span></button>
-      <button class="tab-btn" onclick="switchTab('detail', this)">🔍 Detail View</button>
-      <button class="tab-btn" onclick="switchTab('bugs', this)">🐛 Bug Reports <span class="tab-badge" id="bug-count">0</span></button>
+  <!-- ══ MAIN ═══════════════════════════════════════════════════════════════ -->
+  <main class="main">
+    <div class="tabbar">
+      <button class="tab active" onclick="switchTab('overview',this)">🏠 Overview</button>
+      <button class="tab" id="tab-cases" onclick="switchTab('cases',this)">📋 Test Cases <span class="tbadge" id="tc-badge">0</span></button>
+      <button class="tab" onclick="switchTab('bugs',this)">🐛 Bugs <span class="tbadge" id="bug-badge">0</span></button>
       <div class="tab-actions">
-        <button class="btn-outline" onclick="exportExcel()">⬇ Export Excel</button>
-        <button class="btn-outline" onclick="exportCSV()">⬇ Export CSV</button>
-        <button class="btn-danger" onclick="openBugModal(null)" id="btn-report-bug">🐛 Report Bug</button>
+        <button class="btn btn-ghost" onclick="exportExcel()">⬇ Excel</button>
+        <button class="btn btn-ghost" onclick="exportCSV()">⬇ CSV</button>
+        <button class="btn btn-red"   onclick="openBugModal(null)">🐛 Report Bug</button>
       </div>
     </div>
 
-    <!-- Progress log -->
-    <div style="padding:0 24px;padding-top:16px">
-      <div class="gen-progress" id="gen-progress">
-        <div class="progress-title">⚙ Generating ISTQB-compliant test cases...</div>
-        <div class="progress-log" id="progress-log"></div>
+    <div class="content">
+      <!-- Progress -->
+      <div class="progress-box" id="progress-box">
+        <div class="pb-title">⟳ AI Generating Test Cases...</div>
+        <div class="pb-log" id="pb-log"></div>
       </div>
-    </div>
-
-    <!-- Filters (shown on table view) -->
-    <div class="filters-bar" id="filters-bar" style="display:none">
-      <span style="font-size:11px;font-weight:600;color:#999;align-self:center">Filter:</span>
-      <button class="filter-chip active" onclick="filterTC('all', this)">All</button>
-      <button class="filter-chip" onclick="filterTC('not-run', this)">Not Run</button>
-      <button class="filter-chip" onclick="filterTC('pass', this)">Pass</button>
-      <button class="filter-chip" onclick="filterTC('fail', this)">Fail</button>
-      <button class="filter-chip" onclick="filterTC('blocked', this)">Blocked</button>
-      <button class="filter-chip" onclick="filterTC('critical', this)" style="border-color:var(--red);color:var(--red)">Critical</button>
-      <button class="filter-chip" onclick="filterTC('high', this)" style="border-color:var(--gold);color:var(--gold)">High</button>
-      <input type="text" style="padding:5px 12px;border:1px solid var(--border);border-radius:20px;font-size:11px;outline:none;margin-left:auto;width:180px" placeholder="Search test cases..." oninput="searchTC(this.value)">
-    </div>
-
-    <!-- Content Views -->
-    <div class="content-area">
 
       <!-- Overview -->
       <div class="view active" id="view-overview">
-        <div class="empty-state" id="empty-state">
-          <div class="es-glyph">§</div>
-          <h2 class="es-title">Document to Test Cases</h2>
-          <p class="es-sub">Upload your BRS, FRS, or test plan documents and let AI generate complete ISTQB-standard test cases automatically.</p>
-          <div class="es-steps">
-            <div class="es-step"><div class="es-step-num">1</div><div class="es-step-title">Upload Documents</div><div class="es-step-sub">PDF, Word, Excel, or paste text directly</div></div>
-            <div class="es-step"><div class="es-step-num">2</div><div class="es-step-title">Configure</div><div class="es-step-sub">Set project, module, test type and preferences</div></div>
-            <div class="es-step"><div class="es-step-num">3</div><div class="es-step-title">Generate & Execute</div><div class="es-step-sub">Review cases, update status, report bugs</div></div>
+        <div class="empty" id="ov-empty">
+          <div class="e-glyph">§</div>
+          <div class="e-title">TestCase Studio Pro</div>
+          <div class="e-sub">Upload BRS, FRS, or test plan documents. Generate ISTQB or Jira-style test cases. Track execution. Report bugs via email or download.</div>
+          <div class="how">
+            <div class="how-card"><div class="how-n">01</div><div class="how-t">Upload Docs</div><div class="how-s">PDF, Word, Excel, CSV or paste text</div></div>
+            <div class="how-card"><div class="how-n">02</div><div class="how-t">Choose Mode</div><div class="how-s">ISTQB cards or Jira-style backlog table</div></div>
+            <div class="how-card"><div class="how-n">03</div><div class="how-t">Execute & Track</div><div class="how-s">Update status, file bugs, export reports</div></div>
           </div>
         </div>
-        <div id="overview-content" style="display:none">
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px" id="overview-cards"></div>
-          <div style="background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)">
-            <div style="font-family:var(--font-serif);font-size:20px;margin-bottom:16px">Document Analysis</div>
-            <div id="doc-analysis" style="font-size:13px;color:#555;line-height:1.9;white-space:pre-wrap"></div>
+        <div id="ov-content" style="display:none">
+          <div class="ov-cards" id="ov-cards"></div>
+          <div class="ov-analysis" id="ov-analysis"></div>
+        </div>
+      </div>
+
+      <!-- Test Cases (ISTQB cards OR Jira table) -->
+      <div class="view" id="view-cases">
+        <!-- ISTQB mode -->
+        <div id="istqb-view">
+          <div class="istqb-grid" id="istqb-grid"></div>
+        </div>
+        <!-- Jira mode -->
+        <div id="jira-view" style="display:none">
+          <div class="jira-filters">
+            <input class="ji-search" placeholder="🔍 Search..." oninput="jiraSearch(this.value)">
+            <select class="ji-sel" onchange="jiraFilterStatus(this.value)">
+              <option value="">All Statuses</option>
+              <option>To Do</option><option>In Progress</option>
+              <option>Done</option><option>Failed</option><option>Blocked</option>
+            </select>
+            <select class="ji-sel" onchange="jiraFilterPri(this.value)">
+              <option value="">All Priorities</option>
+              <option>Critical</option><option>High</option>
+              <option>Medium</option><option>Low</option>
+            </select>
+          </div>
+          <div class="jira-wrap">
+            <table class="jira-tbl">
+              <thead>
+                <tr>
+                  <th>Key</th><th>Summary</th><th>Type</th>
+                  <th>Priority</th><th>Status</th><th>Assignee</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="jira-tbody"></tbody>
+            </table>
           </div>
         </div>
       </div>
 
-      <!-- Table View -->
-      <div class="view" id="view-table">
-        <div class="tc-table-wrap">
-          <table class="tc-table" id="tc-table">
-            <thead>
-              <tr>
-                <th>TC ID</th>
-                <th>Title</th>
-                <th>Module</th>
-                <th>Type</th>
-                <th>Priority</th>
-                <th>Prerequisites</th>
-                <th>Test Steps</th>
-                <th>Expected Result</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="tc-tbody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Detail View -->
-      <div class="view" id="view-detail">
-        <div id="detail-list"></div>
-      </div>
-
-      <!-- Bug Reports -->
+      <!-- Bugs -->
       <div class="view" id="view-bugs">
-        <div id="bug-list">
-          <div class="empty-state" style="padding:40px">
-            <div class="es-glyph" style="font-size:48px">🐛</div>
-            <h2 class="es-title" style="font-size:22px">No bugs reported yet</h2>
-            <p class="es-sub">Click "Report Bug" on any test case or use the button above.</p>
+        <div class="bug-grid" id="bug-grid">
+          <div class="empty" style="grid-column:1/-1;padding:40px">
+            <div class="e-glyph" style="font-size:48px">🐛</div>
+            <div class="e-title" style="font-size:22px">No bugs filed</div>
+            <div class="e-sub">Click "Report Bug" on any failed test or use the toolbar button.</div>
           </div>
         </div>
       </div>
-
     </div>
   </main>
 </div>
 
-<!-- Bug Report Modal -->
-<div class="modal-overlay" id="bug-modal">
+<!-- ══ BUG MODAL ═══════════════════════════════════════════════════════════ -->
+<div class="overlay" id="bug-overlay">
   <div class="modal">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title">🐛 Bug Report</div>
-        <div class="modal-subtitle">ISTQB Defect Report Template</div>
-      </div>
+    <div class="modal-head">
+      <div class="modal-head-eyebrow">Defect Report</div>
+      <div class="modal-head-title">🐛 Report Bug</div>
+      <div class="modal-head-id" id="m-bug-id">BUG-001</div>
       <button class="modal-close" onclick="closeBugModal()">✕</button>
     </div>
     <div class="modal-body">
-      <div class="bug-form-grid">
-        <!-- Bug ID -->
-        <div class="bug-field">
-          <label>Bug ID</label>
-          <div class="bug-id-display" id="bug-id-display">BUG-001</div>
+      <!-- Email panel -->
+      <div class="email-panel">
+        <div class="ep-title">📧 Email Delivery</div>
+        <div class="ep-grid">
+          <input type="email" id="e-to"      placeholder="To: dev@company.com">
+          <input type="email" id="e-cc"      placeholder="CC: qa-lead@company.com">
+          <input type="text"  id="e-subject" placeholder="Subject (auto-filled)" class="ep-full">
         </div>
-        <!-- Date -->
-        <div class="bug-field">
-          <label>Date Reported</label>
-          <input type="date" id="bug-date">
-        </div>
-        <!-- TC Ref -->
-        <div class="bug-field">
-          <label>Test Case Reference</label>
-          <input type="text" id="bug-tc-ref" placeholder="TC-001">
-        </div>
-        <!-- Reported By -->
-        <div class="bug-field">
-          <label>Reported By</label>
-          <input type="text" id="bug-reporter" placeholder="QA Engineer">
-        </div>
-        <!-- Title -->
-        <div class="bug-field full">
-          <label>Bug Title / Summary</label>
-          <input type="text" id="bug-title" placeholder="Brief description of the defect...">
-        </div>
-        <!-- Severity -->
-        <div class="bug-field full">
-          <label>Severity</label>
-          <div class="severity-grid">
-            <div><input type="radio" name="bug-sev" id="sev-critical" class="sev-opt sev-critical" value="Critical" checked><label for="sev-critical" class="sev-lbl">🔴 Critical</label></div>
-            <div><input type="radio" name="bug-sev" id="sev-high" class="sev-opt sev-high" value="High"><label for="sev-high" class="sev-lbl">🟡 High</label></div>
-            <div><input type="radio" name="bug-sev" id="sev-medium" class="sev-opt sev-medium" value="Medium"><label for="sev-medium" class="sev-lbl">🔵 Medium</label></div>
-            <div><input type="radio" name="bug-sev" id="sev-low" class="sev-opt sev-low" value="Low"><label for="sev-low" class="sev-lbl">🟢 Low</label></div>
+      </div>
+
+      <!-- Details -->
+      <div class="m-section">
+        <div class="m-section-title">📌 Issue Details</div>
+        <div class="m-grid">
+          <div class="mf mf-full"><label>Summary *</label><input type="text" id="m-title" placeholder="Brief description..."></div>
+          <div class="mf"><label>TC Reference</label><input type="text" id="m-tc-ref" placeholder="TC-001"></div>
+          <div class="mf"><label>Date</label><input type="date" id="m-date"></div>
+          <div class="mf"><label>Reporter</label><input type="text" id="m-reporter"></div>
+          <div class="mf"><label>Assignee</label><input type="text" id="m-assignee" placeholder="Developer name"></div>
+          <div class="mf"><label>Module</label><input type="text" id="m-module"></div>
+          <div class="mf"><label>Environment</label><input type="text" id="m-env" placeholder="QA / Staging / Prod"></div>
+          <div class="mf"><label>Build / Version</label><input type="text" id="m-build" placeholder="v1.0.0"></div>
+          <div class="mf"><label>Priority</label>
+            <select id="m-priority"><option>Urgent</option><option>High</option><option>Medium</option><option>Low</option></select>
           </div>
+          <div class="mf"><label>Status</label>
+            <select id="m-status"><option>Open</option><option>In Progress</option><option>Fixed</option><option>Closed</option><option>Deferred</option></select>
+          </div>
+          <div class="mf"><label>Labels</label><input type="text" id="m-labels" placeholder="ui, regression..."></div>
+          <div class="mf"><label>Fix Version</label><input type="text" id="m-fixver"></div>
         </div>
-        <!-- Priority -->
-        <div class="bug-field">
-          <label>Priority</label>
-          <select id="bug-priority">
-            <option>Urgent</option><option>High</option><option>Medium</option><option>Low</option>
-          </select>
+      </div>
+
+      <!-- Severity -->
+      <div class="m-section">
+        <div class="m-section-title">⚠️ Severity</div>
+        <div class="sev-grid">
+          <div><input type="radio" name="sev" id="sr-crit" class="sev-radio sr-crit" value="Critical" checked><label for="sr-crit" class="sev-lbl">🔴 Critical</label></div>
+          <div><input type="radio" name="sev" id="sr-high" class="sev-radio sr-high" value="High"><label for="sr-high" class="sev-lbl">🟡 High</label></div>
+          <div><input type="radio" name="sev" id="sr-med"  class="sev-radio sr-med"  value="Medium"><label for="sr-med"  class="sev-lbl">🔵 Medium</label></div>
+          <div><input type="radio" name="sev" id="sr-low"  class="sev-radio sr-low"  value="Low"><label for="sr-low"  class="sev-lbl">🟢 Low</label></div>
         </div>
-        <!-- Status -->
-        <div class="bug-field">
-          <label>Status</label>
-          <select id="bug-status">
-            <option>New</option><option>Open</option><option>In Progress</option><option>Fixed</option><option>Closed</option><option>Deferred</option>
-          </select>
-        </div>
-        <!-- Module -->
-        <div class="bug-field">
-          <label>Module / Component</label>
-          <input type="text" id="bug-module" placeholder="e.g. Login Module">
-        </div>
-        <!-- Assigned To -->
-        <div class="bug-field">
-          <label>Assigned To</label>
-          <input type="text" id="bug-assignee" placeholder="Developer name">
-        </div>
-        <!-- Environment -->
-        <div class="bug-field">
-          <label>Environment</label>
-          <input type="text" id="bug-env" placeholder="e.g. QA / Staging / Prod">
-        </div>
-        <!-- Build -->
-        <div class="bug-field">
-          <label>Build / Version</label>
-          <input type="text" id="bug-build" placeholder="v1.0.0">
-        </div>
-        <!-- Description -->
-        <div class="bug-field full">
-          <label>Description</label>
-          <textarea id="bug-desc" rows="3" placeholder="Detailed description of the defect..."></textarea>
-        </div>
-        <!-- Steps to Reproduce -->
-        <div class="bug-field full">
-          <label>Steps to Reproduce</label>
-          <textarea id="bug-steps" rows="5" placeholder="1. Navigate to...&#10;2. Click on...&#10;3. Enter...&#10;4. Click Submit"></textarea>
-        </div>
-        <!-- Expected -->
-        <div class="bug-field">
-          <label>Expected Result</label>
-          <textarea id="bug-expected" rows="3" placeholder="What should happen..."></textarea>
-        </div>
-        <!-- Actual -->
-        <div class="bug-field">
-          <label>Actual Result</label>
-          <textarea id="bug-actual" rows="3" placeholder="What actually happened..."></textarea>
-        </div>
-        <!-- Impact -->
-        <div class="bug-field full">
-          <label>Impact / Risk</label>
-          <textarea id="bug-impact" rows="2" placeholder="Business impact of this defect..."></textarea>
-        </div>
-        <!-- Attachments note -->
-        <div class="bug-field full">
-          <label>Attachments / Evidence</label>
-          <input type="text" id="bug-attachments" placeholder="Screenshot names, video links, log files...">
+      </div>
+
+      <!-- Description -->
+      <div class="m-section">
+        <div class="m-section-title">📝 Reproduction Details</div>
+        <div class="m-grid">
+          <div class="mf mf-full"><label>Description</label><textarea id="m-desc" rows="3" placeholder="Detailed description of the defect..."></textarea></div>
+          <div class="mf mf-full"><label>Steps to Reproduce</label><textarea id="m-steps" rows="5" placeholder="1. Navigate to...&#10;2. Click...&#10;3. Enter...&#10;4. Observe result"></textarea></div>
+          <div class="mf"><label>Expected Result</label><textarea id="m-expected" rows="3" placeholder="What should happen..."></textarea></div>
+          <div class="mf"><label>Actual Result</label><textarea id="m-actual" rows="3" placeholder="What actually happened..."></textarea></div>
+          <div class="mf mf-full"><label>Impact / Business Risk</label><textarea id="m-impact" rows="2" placeholder="Business impact..."></textarea></div>
+          <div class="mf mf-full"><label>Attachments / Evidence</label><input type="text" id="m-attach" placeholder="screenshot.png, video.mp4, error.log..."></div>
         </div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn-outline" onclick="closeBugModal()">Cancel</button>
-      <button class="btn-outline" onclick="exportBugPDF()">⬇ Export PDF</button>
-      <button class="btn-danger" onclick="saveBugReport()">🐛 Save Bug Report</button>
+    <div class="modal-foot">
+      <div class="mf-note">Fill details → Send via email or download as PDF report</div>
+      <button class="btn btn-ghost" onclick="closeBugModal()">Cancel</button>
+      <button class="btn btn-ghost" onclick="downloadBug()">⬇ Download PDF</button>
+      <button class="btn btn-ghost" onclick="sendEmail()">📧 Send Email</button>
+      <button class="btn btn-red"   onclick="saveBug()">🐛 Save Bug</button>
     </div>
   </div>
 </div>
 
-<!-- Toast -->
+<!-- ══ NO-API PROMPT MODAL ════════════════════════════════════════════════ -->
+<div class="overlay" id="prompt-overlay">
+  <div class="modal">
+    <div class="modal-head" style="background:linear-gradient(135deg,var(--ink2),var(--ink4))">
+      <div class="modal-head-eyebrow">No API Key Required</div>
+      <div class="modal-head-title">📋 Manual AI Prompt</div>
+      <button class="modal-close" onclick="closePromptModal()">✕</button>
+    </div>
+    <div class="prompt-modal-body">
+      <div class="prompt-steps">
+        <div class="ps"><div class="ps-n">1</div><div class="ps-t">Copy Prompt</div><div class="ps-s">Click the button below</div></div>
+        <div class="ps"><div class="ps-n">2</div><div class="ps-t">Open AI Tool</div><div class="ps-s">Claude, ChatGPT or Gemini</div></div>
+        <div class="ps"><div class="ps-n">3</div><div class="ps-t">Paste & Import</div><div class="ps-s">Paste JSON response back here</div></div>
+      </div>
+
+      <div style="margin-bottom:10px;font-size:12px;font-weight:600;color:var(--ink3)">Open one of these AI tools:</div>
+      <div class="ai-links">
+        <a class="ai-link" href="https://claude.ai" target="_blank"><span class="ai-link-icon">🟠</span>Claude.ai</a>
+        <a class="ai-link" href="https://chat.openai.com" target="_blank"><span class="ai-link-icon">🟢</span>ChatGPT</a>
+        <a class="ai-link" href="https://gemini.google.com" target="_blank"><span class="ai-link-icon">🔵</span>Gemini</a>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:12px;font-weight:600;color:var(--ink3)">Generated Prompt (copy this):</span>
+        <button class="btn btn-solid" onclick="copyPrompt()" style="font-size:11px;padding:5px 12px">⎘ Copy Prompt</button>
+      </div>
+      <textarea class="prompt-box" id="prompt-box" readonly></textarea>
+
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--mist2)">
+        <div style="font-size:12px;font-weight:600;color:var(--ink3);margin-bottom:8px">Paste AI response (JSON) here to import:</div>
+        <textarea id="json-import-box" placeholder='Paste the JSON response from Claude/ChatGPT/Gemini here...' style="width:100%;min-height:80px;background:var(--mist);border:1.5px solid var(--border);border-radius:var(--r);padding:10px 12px;font-family:var(--mono);font-size:12px;color:var(--ink);outline:none;resize:vertical;line-height:1.5;transition:border-color 0.2s" onfocus="this.style.borderColor='var(--accent)'"></textarea>
+        <div style="display:flex;justify-content:flex-end;margin-top:8px;gap:8px">
+          <button class="btn btn-ghost" onclick="closePromptModal()">Cancel</button>
+          <button class="btn btn-solid" onclick="importJSON()">⬇ Import Test Cases</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-// ── State ─────────────────────────────────────────────────────────────────────
-let testCases = [];
-let bugReports = [];
-let uploadedContent = [];
-let currentFilter = 'all';
-let bugCounter = 1;
-let activeTCRef = null;
+// ═══════════════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════════════
+let TCs = [], bugs = [], uploads = [], bugNum = 1;
+let currentMode = 'istqb'; // 'istqb' | 'jira'
+let useAPI = false;
+let jSearchVal = '', jStatusVal = '', jPriVal = '';
 
-// ── API Key ───────────────────────────────────────────────────────────────────
-const apiKeyEl = document.getElementById('api-key');
-const apiDot   = document.getElementById('api-dot');
-apiKeyEl.addEventListener('input', () => {
-  const valid = apiKeyEl.value.startsWith('sk-ant-') && apiKeyEl.value.length > 20;
-  apiDot.classList.toggle('on', valid);
-  if (valid) localStorage.setItem('tcs_key', apiKeyEl.value);
-});
-const saved = localStorage.getItem('tcs_key');
-if (saved) { apiKeyEl.value = saved; apiDot.classList.add('on'); }
-
-function getKey() {
-  const k = apiKeyEl.value.trim();
-  if (!k) { showToast('Enter your Anthropic API key first', 'err'); return null; }
-  return k;
+// ═══════════════════════════════════════════════════════════════════════════
+// MODE TOGGLE (ISTQB ↔ Jira)
+// ═══════════════════════════════════════════════════════════════════════════
+function setMode(mode) {
+  currentMode = mode;
+  document.body.classList.toggle('jira-mode', mode === 'jira');
+  document.getElementById('btn-istqb').classList.toggle('active', mode === 'istqb');
+  document.getElementById('btn-jira').classList.toggle('active', mode === 'jira');
+  document.getElementById('brand-span').textContent = mode === 'jira' ? ' Jira' : ' Studio';
+  document.getElementById('tab-cases').querySelector('.tbadge').textContent = TCs.length;
+  if (document.getElementById('view-cases').classList.contains('active')) renderCases();
+  toast(mode === 'jira' ? 'Switched to Jira-Style view' : 'Switched to ISTQB view', 'info');
 }
 
-// ── File Upload ───────────────────────────────────────────────────────────────
-const dropZone = document.getElementById('drop-zone');
-const fileInput = document.getElementById('file-input');
-
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
-dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag'); handleFiles(e.dataTransfer.files); });
-fileInput.addEventListener('change', () => handleFiles(fileInput.files));
-
-async function handleFiles(files) {
-  for (const file of files) {
-    const ext = file.name.split('.').pop().toLowerCase();
-    let content = '';
-    try {
-      if (ext === 'txt' || ext === 'csv') {
-        content = await file.text();
-      } else if (ext === 'docx' || ext === 'doc') {
-        const ab = await file.arrayBuffer();
-        const result = await mammoth.extractRawText({ arrayBuffer: ab });
-        content = result.value;
-      } else if (ext === 'xlsx' || ext === 'xls') {
-        const ab = await file.arrayBuffer();
-        const wb = XLSX.read(ab, { type: 'array' });
-        content = wb.SheetNames.map(n => {
-          const ws = wb.Sheets[n];
-          return `Sheet: ${n}\n${XLSX.utils.sheet_to_csv(ws)}`;
-        }).join('\n\n');
-      } else if (ext === 'pdf') {
-        content = `[PDF: ${file.name}] — PDF text extraction requires the app to be served. Content will be described by filename.`;
-      } else {
-        content = await file.text();
-      }
-      uploadedContent.push({ name: file.name, size: file.size, content });
-      renderUploadedFiles();
-      showToast(`Loaded: ${file.name}`, 'ok');
-    } catch(e) {
-      showToast(`Error reading ${file.name}: ${e.message}`, 'err');
-    }
+// ═══════════════════════════════════════════════════════════════════════════
+// API SOURCE TOGGLE
+// ═══════════════════════════════════════════════════════════════════════════
+function toggleSource() {
+  useAPI = !useAPI;
+  document.getElementById('src-toggle').classList.toggle('on', useAPI);
+  document.getElementById('src-lbl').textContent = useAPI ? 'Claude API' : 'Manual (No API)';
+  document.getElementById('api-pill').classList.toggle('hidden', !useAPI);
+  document.getElementById('btn-gen').classList.toggle('hidden', !useAPI);
+  document.getElementById('btn-noapi').classList.toggle('hidden', useAPI);
+  if (useAPI && !document.getElementById('btn-gen').classList.contains('hidden')) {
+    document.getElementById('btn-gen').style.display = '';
   }
 }
 
-function renderUploadedFiles() {
-  const el = document.getElementById('uploaded-files');
-  el.innerHTML = uploadedContent.map((f, i) => {
-    const ext = f.name.split('.').pop().toUpperCase();
-    const icons = { PDF: '📄', DOCX: '📝', DOC: '📝', XLSX: '📊', XLS: '📊', TXT: '📃', CSV: '📊' };
-    const sz = f.size > 1024*1024 ? (f.size/1024/1024).toFixed(1)+'MB' : Math.round(f.size/1024)+'KB';
-    return `<div class="uploaded-file">
-      <span class="uf-icon">${icons[ext] || '📄'}</span>
-      <span class="uf-name">${f.name}</span>
-      <span class="uf-size">${sz}</span>
-      <button class="uf-remove" onclick="removeFile(${i})">✕</button>
-    </div>`;
+// Apply initial state
+document.getElementById('btn-gen').style.display = 'none';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// API KEY
+// ═══════════════════════════════════════════════════════════════════════════
+const apiEl = document.getElementById('api-key');
+const apiDot = document.getElementById('api-dot');
+apiEl.addEventListener('input', () => {
+  const ok = apiEl.value.startsWith('sk-ant-') && apiEl.value.length > 20;
+  apiDot.classList.toggle('live', ok);
+  if (ok) localStorage.setItem('tcs_pro_key', apiEl.value);
+});
+const sk = localStorage.getItem('tcs_pro_key');
+if (sk) { apiEl.value = sk; apiDot.classList.add('live'); }
+const getKey = () => { const k = apiEl.value.trim(); if (!k) { toast('Enter your Anthropic API key', 'err'); return null; } return k; };
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FILE UPLOAD
+// ═══════════════════════════════════════════════════════════════════════════
+const dz = document.getElementById('drop-zone');
+const fi = document.getElementById('file-input');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag'); handleFiles(e.dataTransfer.files); });
+fi.addEventListener('change', () => handleFiles(fi.files));
+
+async function handleFiles(files) {
+  for (const f of files) {
+    const ext = f.name.split('.').pop().toLowerCase();
+    let content = '';
+    try {
+      if (['txt','csv'].includes(ext)) { content = await f.text(); }
+      else if (['docx','doc'].includes(ext)) { const r = await mammoth.extractRawText({ arrayBuffer: await f.arrayBuffer() }); content = r.value; }
+      else if (['xlsx','xls'].includes(ext)) { const wb = XLSX.read(await f.arrayBuffer(), { type:'array' }); content = wb.SheetNames.map(n => `[Sheet:${n}]\n${XLSX.utils.sheet_to_csv(wb.Sheets[n])}`).join('\n\n'); }
+      else { content = `[${f.name}] — Uploaded document. Reference this file for context.`; }
+      uploads.push({ name: f.name, size: f.size, content });
+      renderFileList();
+      toast('Loaded: ' + f.name, 'ok');
+    } catch(e) { toast('Error reading ' + f.name, 'err'); }
+  }
+}
+
+function renderFileList() {
+  const icons = { pdf:'📄', docx:'📝', doc:'📝', xlsx:'📊', xls:'📊', txt:'📃', csv:'📊' };
+  document.getElementById('file-list').innerHTML = uploads.map((f,i) => {
+    const ext = f.name.split('.').pop().toLowerCase();
+    const sz = f.size > 1e6 ? (f.size/1e6).toFixed(1)+'MB' : Math.round(f.size/1024)+'KB';
+    return `<div class="file-item"><span>${icons[ext]||'📄'}</span><span class="fi-name">${f.name}</span><span style="font-size:10px;color:var(--border2)">${sz}</span><button class="fi-rm" onclick="uploads.splice(${i},1);renderFileList()">✕</button></div>`;
   }).join('');
 }
 
-function removeFile(i) { uploadedContent.splice(i, 1); renderUploadedFiles(); }
-
-// ── Build Prompt ──────────────────────────────────────────────────────────────
-function buildGeneratePrompt() {
-  const paste   = document.getElementById('paste-area').value.trim();
-  const project = document.getElementById('opt-project').value || 'Project';
-  const module  = document.getElementById('opt-module').value || 'General';
-  const version = document.getElementById('opt-version').value || 'v1.0';
-  const author  = document.getElementById('opt-author').value || 'QA Engineer';
-  const type    = document.getElementById('opt-type').value;
-  const priority= document.getElementById('opt-priority').value;
+// ═══════════════════════════════════════════════════════════════════════════
+// BUILD PROMPT
+// ═══════════════════════════════════════════════════════════════════════════
+function buildPrompt() {
+  const paste   = document.getElementById('paste-content').value.trim();
+  const project = document.getElementById('cfg-project').value || 'Project';
+  const module  = document.getElementById('cfg-module').value  || 'General';
+  const version = document.getElementById('cfg-version').value || 'v1.0';
+  const author  = document.getElementById('cfg-author').value  || 'QA Engineer';
+  const type    = document.getElementById('cfg-type').value;
+  const priority= document.getElementById('cfg-priority').value;
   const edge    = document.getElementById('chk-edge').checked;
   const neg     = document.getElementById('chk-neg').checked;
   const data    = document.getElementById('chk-data').checked;
   const api     = document.getElementById('chk-api').checked;
-  const prereq  = document.getElementById('chk-prereq').checked;
 
-  const docs = uploadedContent.map(f => `--- Document: ${f.name} ---\n${f.content.slice(0, 3000)}`).join('\n\n');
+  const docs = uploads.map(f => `[${f.name}]:\n${f.content.slice(0,3000)}`).join('\n\n');
   const allContent = [docs, paste].filter(Boolean).join('\n\n');
+  if (!allContent.trim() || allContent.trim().length < 20) throw new Error('Please upload documents or paste content first');
 
-  if (!allContent.trim()) throw new Error('Please upload documents or paste content first');
+  const projKey = project.toUpperCase().replace(/\s+/g,'-').slice(0,6);
 
-  return `You are a senior QA engineer following ISTQB standards. Analyze the following document content (BRS/FRS/Test Plan) and generate comprehensive test cases.
+  return `You are a senior QA engineer. Analyze the following document content (BRS/FRS/Test Plan) and generate comprehensive test cases following ${currentMode === 'istqb' ? 'ISTQB' : 'Jira'} standards.
 
 ## Document Content:
 ${allContent.slice(0, 8000)}
 
-## Project Details:
-- Project: ${project}
-- Module: ${module}
-- Version: ${version}
-- Prepared By: ${author}
-- Test Type: ${type}
-- Priority Focus: ${priority}
+## Settings:
+- Project: ${project} | Module: ${module} | Version: ${version} | Author: ${author}
+- Test Type: ${type} | Priority: ${priority}
+- Include: ${[edge?'edge cases':'',neg?'negative tests':'',data?'test data':'',api?'API tests':''].filter(Boolean).join(', ')||'standard scenarios'}
 
-## Requirements:
-${edge ? '- Include edge case test scenarios' : ''}
-${neg ? '- Include negative/invalid input test cases' : ''}
-${data ? '- Include specific test data examples in steps' : ''}
-${api ? '- Include API-level test cases where relevant' : ''}
-${prereq ? '- List specific prerequisites for each test case' : ''}
-
-## ISTQB Test Case Format:
-Generate test cases in this EXACT JSON format. Return ONLY valid JSON, no markdown, no explanation:
+## IMPORTANT: Return ONLY valid JSON, no markdown fences, no explanation text.
 
 {
-  "analysis": "Brief summary of what was analyzed and key areas covered (2-3 sentences)",
+  "analysis": "2-3 sentence summary of the document and what test areas are covered",
   "project": "${project}",
   "module": "${module}",
-  "version": "${version}",
-  "author": "${author}",
-  "testType": "${type}",
-  "generatedDate": "${new Date().toISOString().slice(0,10)}",
   "testCases": [
     {
       "id": "TC-001",
-      "title": "Verify [feature] with [condition]",
-      "module": "${module}",
+      "key": "${projKey}-TC-001",
+      "summary": "Verify [action] when [condition]",
       "feature": "Feature name from document",
-      "objective": "What this test verifies",
+      "epic": "${module}",
       "type": "${type}",
-      "priority": "Critical|High|Medium|Low",
-      "prerequisites": "System is running, user is logged in, etc.",
-      "testData": "Username: testuser@example.com, Password: Test@123",
+      "priority": "Critical",
+      "assignee": "${author}",
+      "fixVersion": "${version}",
+      "labels": ["smoke"],
+      "objective": "One sentence objective",
+      "preconditions": "System preconditions",
+      "testData": "Specific test data values",
       "steps": [
-        {"step": 1, "action": "Navigate to login page", "expected": "Login page loads with username and password fields"},
-        {"step": 2, "action": "Enter valid username and password", "expected": "Credentials are accepted"},
-        {"step": 3, "action": "Click Login button", "expected": "User is redirected to dashboard"}
+        {"step": 1, "action": "Navigate to login page", "expected": "Login page displays with all fields"},
+        {"step": 2, "action": "Enter valid credentials", "expected": "Credentials accepted without errors"}
       ],
-      "expectedResult": "Overall expected outcome of the test",
+      "expectedResult": "Overall expected outcome",
+      "status": "To Do",
       "actualResult": "",
-      "status": "Not Run",
       "remarks": ""
     }
   ]
 }
 
-Generate at least 12-18 comprehensive test cases covering:
-1. Happy path / positive scenarios
-2. Negative / invalid input scenarios  
-3. Boundary value scenarios
-4. Edge cases
-5. Integration points
-6. Security/validation scenarios (if applicable)
-${api ? '7. API endpoint validation' : ''}
-
-Prioritize: Critical for core business flows, High for main features, Medium for standard cases, Low for cosmetic/edge.`;
+Generate 14-20 test cases. Cover: happy path, negative/invalid input, boundary values, edge cases, validation rules, security/auth. Priority: Critical=core flows, High=main features, Medium=standard, Low=cosmetic.`;
 }
 
-// ── Generate ──────────────────────────────────────────────────────────────────
-async function generateTestCases() {
+// ═══════════════════════════════════════════════════════════════════════════
+// GENERATE (API mode)
+// ═══════════════════════════════════════════════════════════════════════════
+async function generate() {
   const key = getKey(); if (!key) return;
   let prompt;
-  try { prompt = buildGeneratePrompt(); } catch(e) { showToast(e.message, 'err'); return; }
+  try { prompt = buildPrompt(); } catch(e) { toast(e.message, 'err'); return; }
 
-  const btn = document.getElementById('btn-generate');
+  const btn = document.getElementById('btn-gen');
   btn.classList.add('loading'); btn.disabled = true;
+  const pb = document.getElementById('progress-box');
+  const pbl = document.getElementById('pb-log');
+  pb.classList.add('show'); pbl.innerHTML = '';
 
-  const progress = document.getElementById('gen-progress');
-  const log = document.getElementById('progress-log');
-  progress.classList.add('show');
-  log.innerHTML = '';
-
-  const addLog = (msg, delay = 0) => setTimeout(() => {
-    log.innerHTML += `<div class="line" style="animation-delay:${delay}ms">▸ ${msg}</div>`;
-    log.scrollTop = log.scrollHeight;
-  }, delay);
-
-  addLog('Reading uploaded documents...', 0);
-  addLog('Analyzing requirements and user stories...', 600);
-  addLog('Applying ISTQB test case standards...', 1200);
-  addLog('Generating positive test scenarios...', 1800);
-  addLog('Generating negative and edge case scenarios...', 2400);
-  addLog('Assigning priorities and test types...', 3000);
-  addLog('Structuring test steps and expected results...', 3600);
+  const log = (m,d=0) => setTimeout(() => { pbl.innerHTML += `<div class="pb-line" style="animation-delay:${d}ms">▸ ${m}</div>`; pbl.scrollTop=pbl.scrollHeight; }, d);
+  log('Parsing uploaded documents...',0);
+  log('Identifying requirements and user stories...',500);
+  log(`Applying ${currentMode==='jira'?'Jira':'ISTQB'} test case standards...`,1000);
+  log('Generating positive & negative scenarios...',1600);
+  log('Assigning priorities, steps, expected results...',2200);
 
   try {
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 4000,
-        messages: [{ role: 'user', content: prompt }]
-      })
+      method:'POST',
+      headers:{ 'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:4096, messages:[{role:'user',content:prompt}] })
     });
-
-    if (!resp.ok) {
-      const err = await resp.json().catch(() => ({}));
-      throw new Error(err.error?.message || `API ${resp.status}`);
-    }
-
+    if (!resp.ok) { const e = await resp.json().catch(()=>{}); throw new Error(e?.error?.message||`API ${resp.status}`); }
     const data = await resp.json();
-    let raw = data.content[0].text.trim();
-    // Strip markdown fences if present
-    raw = raw.replace(/^```json?\s*/i, '').replace(/```\s*$/i, '').trim();
-    const result = JSON.parse(raw);
-
-    testCases = result.testCases.map((tc, i) => ({
-      ...tc,
-      id: tc.id || `TC-${String(i+1).padStart(3,'0')}`,
-      status: 'Not Run',
-      actualResult: '',
-      remarks: ''
-    }));
-
-    addLog(`✓ Generated ${testCases.length} test cases successfully!`, 4200);
-
-    setTimeout(() => {
-      progress.classList.remove('show');
-      renderAll(result);
-      switchTab('table', document.querySelectorAll('.tab-btn')[1]);
-      updateStats();
-      showToast(`✓ ${testCases.length} test cases generated!`, 'ok');
-    }, 4800);
-
+    let raw = data.content[0].text.trim().replace(/^```json?\s*/i,'').replace(/```\s*$/,'').trim();
+    importTestCases(JSON.parse(raw));
+    log(`✓ ${TCs.length} test cases generated!`, 2800);
+    setTimeout(() => { pb.classList.remove('show'); toast(`✓ ${TCs.length} test cases generated!`,'ok'); }, 3400);
   } catch(e) {
-    addLog('✗ Error: ' + e.message, 4200);
-    showToast('Error: ' + e.message, 'err');
-  } finally {
-    btn.classList.remove('loading'); btn.disabled = false;
-  }
+    log('✗ Error: '+e.message, 2800);
+    toast('Error: '+e.message,'err');
+  } finally { btn.classList.remove('loading'); btn.disabled=false; }
 }
 
-// ── Render ────────────────────────────────────────────────────────────────────
-function renderAll(result) {
+// ═══════════════════════════════════════════════════════════════════════════
+// NO-API PROMPT MODAL
+// ═══════════════════════════════════════════════════════════════════════════
+function openPromptModal() {
+  let prompt;
+  try { prompt = buildPrompt(); } catch(e) { toast(e.message,'err'); return; }
+  document.getElementById('prompt-box').value = prompt;
+  document.getElementById('json-import-box').value = '';
+  document.getElementById('prompt-overlay').classList.add('open');
+}
+function closePromptModal() { document.getElementById('prompt-overlay').classList.remove('open'); }
+
+async function copyPrompt() {
+  try {
+    await navigator.clipboard.writeText(document.getElementById('prompt-box').value);
+    toast('Prompt copied! Paste it into Claude, ChatGPT or Gemini.','ok');
+  } catch(e) { toast('Select all text in the box and copy manually','info'); }
+}
+
+function importJSON() {
+  const raw = document.getElementById('json-import-box').value.trim();
+  if (!raw) { toast('Please paste the JSON response first','err'); return; }
+  try {
+    const clean = raw.replace(/^```json?\s*/i,'').replace(/```\s*$/,'').trim();
+    const result = JSON.parse(clean);
+    if (!result.testCases?.length) throw new Error('No testCases array found in JSON');
+    importTestCases(result);
+    closePromptModal();
+    toast(`✓ ${TCs.length} test cases imported!`,'ok');
+  } catch(e) { toast('Invalid JSON: '+e.message,'err'); }
+}
+
+function importTestCases(result) {
+  const project = document.getElementById('cfg-project').value || 'Project';
+  TCs = result.testCases.map((tc,i) => ({
+    ...tc,
+    id: tc.id || `TC-${String(i+1).padStart(3,'0')}`,
+    key: tc.key || `${project.toUpperCase().slice(0,4)}-${i+1}`,
+    status: tc.status || 'To Do',
+    actualResult: '', remarks: ''
+  }));
   renderOverview(result);
-  renderTable();
-  renderDetailView();
-  document.getElementById('filters-bar').style.display = 'flex';
+  renderCases();
+  updateStats();
+  switchTab('cases', document.querySelectorAll('.tab')[1]);
+  document.getElementById('nav-project').textContent = result.project || project;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════════════════
 function renderOverview(result) {
-  document.getElementById('empty-state').style.display = 'none';
-  document.getElementById('overview-content').style.display = 'block';
-
-  const priCounts = { Critical: 0, High: 0, Medium: 0, Low: 0 };
-  testCases.forEach(tc => { if (priCounts[tc.priority] !== undefined) priCounts[tc.priority]++; });
-
-  document.getElementById('overview-cards').innerHTML = [
-    { num: testCases.length, lbl: 'Total Test Cases', color: 'var(--ink)', icon: '📋' },
-    { num: priCounts.Critical, lbl: 'Critical Priority', color: 'var(--red)', icon: '🔴' },
-    { num: priCounts.High, lbl: 'High Priority', color: 'var(--gold)', icon: '🟡' },
-    { num: priCounts.Medium + priCounts.Low, lbl: 'Med & Low Priority', color: 'var(--blue)', icon: '🔵' },
-  ].map(s => `
-    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)">
-      <div style="font-size:24px;margin-bottom:4px">${s.icon}</div>
-      <div style="font-family:var(--font-serif);font-size:36px;color:${s.color};line-height:1">${s.num}</div>
-      <div style="font-size:11px;color:#999;text-transform:uppercase;letter-spacing:1px;margin-top:4px">${s.lbl}</div>
-    </div>`).join('');
-
-  document.getElementById('doc-analysis').textContent = result.analysis || 'Analysis complete.';
+  document.getElementById('ov-empty').style.display = 'none';
+  document.getElementById('ov-content').style.display = 'block';
+  const counts = {Critical:0,High:0,Medium:0,Low:0};
+  TCs.forEach(t => { if(counts[t.priority]!==undefined) counts[t.priority]++; });
+  document.getElementById('ov-cards').innerHTML = [
+    {n:TCs.length, l:'Test Cases', c:'var(--accent)', i:'📋'},
+    {n:counts.Critical, l:'Critical', c:'var(--red)', i:'🔴'},
+    {n:counts.High, l:'High', c:'var(--yellow)', i:'🟡'},
+    {n:counts.Medium+counts.Low, l:'Med/Low', c:'var(--green)', i:'🟢'},
+  ].map(s=>`<div class="ov-card"><div style="font-size:20px;margin-bottom:6px">${s.i}</div><div class="ov-num" style="color:${s.c}">${s.n}</div><div class="ov-lbl">${s.l}</div></div>`).join('');
+  document.getElementById('ov-analysis').innerHTML = `<h3>Document Analysis</h3><p>${result.analysis||''}</p>`;
 }
 
-function renderTable(filter = 'all', search = '') {
-  const tbody = document.getElementById('tc-tbody');
-  let tcs = testCases;
-  if (filter === 'not-run') tcs = tcs.filter(t => t.status === 'Not Run');
-  else if (filter === 'pass') tcs = tcs.filter(t => t.status === 'Pass');
-  else if (filter === 'fail') tcs = tcs.filter(t => t.status === 'Fail');
-  else if (filter === 'blocked') tcs = tcs.filter(t => t.status === 'Blocked');
-  else if (filter === 'critical') tcs = tcs.filter(t => t.priority === 'Critical');
-  else if (filter === 'high') tcs = tcs.filter(t => t.priority === 'High' || t.priority === 'Critical');
-  if (search) tcs = tcs.filter(t => t.title.toLowerCase().includes(search.toLowerCase()) || t.id.toLowerCase().includes(search.toLowerCase()));
-
-  tbody.innerHTML = tcs.map(tc => {
-    const steps = (tc.steps || []).map((s, i) => `${i+1}. ${s.action}`).join('\n');
-    const stepsShort = steps.split('\n').slice(0, 3).join('\n') + (steps.split('\n').length > 3 ? '...' : '');
-    return `<tr>
-      <td><span class="tc-id">${tc.id}</span></td>
-      <td><span class="tc-title-cell">${tc.title}</span></td>
-      <td><span class="tc-module" style="font-size:11px;color:#777">${tc.module || ''}</span></td>
-      <td><span class="type-badge">${tc.type || 'Functional'}</span></td>
-      <td><span class="pri-badge pri-${(tc.priority||'medium').toLowerCase()}">${tc.priority}</span></td>
-      <td style="font-size:11px;color:#777;max-width:140px">${tc.prerequisites || '—'}</td>
-      <td><div class="steps-cell" style="white-space:pre-wrap;font-family:var(--font-mono);font-size:11px">${stepsShort}</div></td>
-      <td><div class="expected-cell">${tc.expectedResult || ''}</div></td>
-      <td>
-        <select class="status-select" onchange="updateStatus('${tc.id}', this.value)">
-          ${['Not Run','Pass','Fail','Blocked','Deferred'].map(s =>
-            `<option ${tc.status===s?'selected':''}>${s}</option>`).join('')}
-        </select>
-      </td>
-      <td>
-        <div class="cell-actions">
-          <button class="tc-action-btn" onclick="viewDetail('${tc.id}')">Detail</button>
-          <button class="tc-action-btn bug" onclick="openBugModal('${tc.id}')">🐛 Bug</button>
-        </div>
-      </td>
-    </tr>`;
-  }).join('') || '<tr><td colspan="10" style="text-align:center;padding:32px;color:#999">No test cases match this filter</td></tr>';
-
-  document.getElementById('tc-count').textContent = testCases.length;
+function renderCases() {
+  document.getElementById('istqb-view').style.display = currentMode==='istqb' ? '' : 'none';
+  document.getElementById('jira-view').style.display  = currentMode==='jira'  ? '' : 'none';
+  document.getElementById('tc-badge').textContent = TCs.length;
+  if (currentMode==='istqb') renderISTQB();
+  else renderJira();
 }
 
-function renderDetailView() {
-  const el = document.getElementById('detail-list');
-  el.innerHTML = testCases.map(tc => `
-    <div class="tc-detail-card" id="detail-${tc.id}">
-      <div class="tc-detail-header">
-        <div>
-          <div class="tc-detail-id">${tc.id}</div>
-          <div class="tc-detail-title">${tc.title}</div>
-          <div class="tc-detail-meta">
-            <span class="pri-badge pri-${(tc.priority||'medium').toLowerCase()}">${tc.priority}</span>
-            <span class="type-badge" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8)">${tc.type || 'Functional'}</span>
-            <span class="status-badge status-not-run" id="detail-status-${tc.id}">${tc.status}</span>
+function renderISTQB() {
+  const priMap = {Critical:'b-critical',High:'b-high',Medium:'b-medium',Low:'b-low'};
+  const statusMap = {'To Do':'b-todo','Done':'b-pass','Failed':'b-fail','Blocked':'b-blocked','In Progress':'b-type'};
+  document.getElementById('istqb-grid').innerHTML = TCs.map(tc => `
+    <div class="tc-card">
+      <div class="tc-card-top">
+        <div style="flex:1">
+          <div class="tc-card-id">${tc.key||tc.id}</div>
+          <div class="tc-card-title">${tc.summary||tc.title||''}</div>
+          <div class="tc-card-badges">
+            <span class="badge ${priMap[tc.priority]||'b-medium'}">${tc.priority}</span>
+            <span class="badge b-type">${tc.type||'Functional'}</span>
+            <span class="badge ${statusMap[tc.status]||'b-todo'}" id="istqb-status-${tc.id}">${tc.status}</span>
           </div>
         </div>
-        <button class="tc-action-btn bug" style="background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.3);color:#fff" onclick="openBugModal('${tc.id}')">🐛 Report Bug</button>
       </div>
-      <div class="tc-detail-body">
-        <div class="tc-detail-grid">
-          <div class="tc-detail-field"><label>Objective</label><p>${tc.objective || '—'}</p></div>
-          <div class="tc-detail-field"><label>Feature</label><p>${tc.feature || tc.module || '—'}</p></div>
-          <div class="tc-detail-field"><label>Prerequisites</label><p>${tc.prerequisites || 'None'}</p></div>
-          <div class="tc-detail-field"><label>Test Data</label><p style="font-family:var(--font-mono);font-size:12px">${tc.testData || 'N/A'}</p></div>
-        </div>
-        <div style="margin-bottom:16px">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#999;margin-bottom:10px">Test Steps</div>
-          <ul class="steps-list">
-            ${(tc.steps||[]).map((s,i) => `
-            <li class="step-item">
-              <div class="step-num">${i+1}</div>
-              <div class="step-content">
-                <div class="step-action">${s.action}</div>
-                <div class="step-expected">${s.expected}</div>
-              </div>
-            </li>`).join('')}
+      <div class="tc-card-body">
+        ${tc.preconditions||tc.prerequisites?`<div class="tc-field"><div class="tc-field-label">Preconditions</div><div class="tc-field-val">${tc.preconditions||tc.prerequisites}</div></div>`:''}
+        ${tc.testData?`<div class="tc-field"><div class="tc-field-label">Test Data</div><div class="tc-field-val" style="font-family:var(--mono);font-size:11px;background:var(--mist);padding:6px 9px;border-radius:var(--r);border:1px solid var(--border)">${tc.testData}</div></div>`:''}
+        <div class="tc-field"><div class="tc-field-label">Test Steps</div>
+          <ul class="steps-ol">
+            ${(tc.steps||[]).map((s,i)=>`<li class="step-li"><div class="step-n">${i+1}</div><div class="step-body"><div class="step-action">${s.action}</div><div class="step-exp">${s.expected}</div></div></li>`).join('')}
           </ul>
         </div>
-        <div style="background:var(--mist);border-left:3px solid var(--teal);padding:12px 16px;border-radius:0 6px 6px 0">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--teal);margin-bottom:4px">Expected Result</div>
-          <div style="font-size:13px;color:var(--ink)">${tc.expectedResult}</div>
-        </div>
+        <div class="tc-expected">${tc.expectedResult||''}</div>
       </div>
-    </div>`).join('');
+      <div class="tc-card-foot">
+        <select class="status-select" onchange="updateStatus('${tc.id}',this.value)">
+          ${['To Do','In Progress','Done','Failed','Blocked','Deferred'].map(s=>`<option ${tc.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+        <span style="flex:1"></span>
+        <button class="tc-btn bug" onclick="openBugModal('${tc.id}')">🐛 Bug</button>
+      </div>
+    </div>`).join('') || '<div class="empty"><div class="e-glyph">§</div><div class="e-title">No test cases</div></div>';
 }
 
-function viewDetail(id) {
-  switchTab('detail', document.querySelectorAll('.tab-btn')[2]);
-  setTimeout(() => {
-    const el = document.getElementById('detail-' + id);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 100);
+function renderJira(search='', status='', priority='') {
+  const priMap = {Critical:'b-critical',High:'b-high',Medium:'b-medium',Low:'b-low'};
+  const statusCls = {'To Do':'b-todo','In Progress':'b-type','Done':'b-pass','Failed':'b-fail','Blocked':'b-blocked'};
+  let tcs = TCs;
+  if (jSearchVal) tcs = tcs.filter(t => (t.summary||t.title||'').toLowerCase().includes(jSearchVal) || (t.key||'').toLowerCase().includes(jSearchVal));
+  if (jStatusVal) tcs = tcs.filter(t => t.status === jStatusVal);
+  if (jPriVal)    tcs = tcs.filter(t => t.priority === jPriVal);
+
+  document.getElementById('jira-tbody').innerHTML = tcs.map(tc => `
+    <tr>
+      <td><span class="j-key">${tc.key||tc.id}</span></td>
+      <td><span class="j-summary">${tc.summary||tc.title||''}<small>${tc.epic||tc.module||''} ${tc.feature?'· '+tc.feature:''}</small></span></td>
+      <td style="font-size:11px;color:var(--border2)">${tc.type||'Functional'}</td>
+      <td><span class="badge ${priMap[tc.priority]||'b-medium'}">${tc.priority}</span></td>
+      <td>
+        <select class="status-select" onchange="updateStatus('${tc.id}',this.value)">
+          ${['To Do','In Progress','Done','Failed','Blocked','Deferred'].map(s=>`<option ${tc.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </td>
+      <td style="font-size:12px;color:var(--ink3)">${tc.assignee||'—'}</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="tc-btn bug" onclick="openBugModal('${tc.id}')">🐛 Bug</button>
+        </div>
+      </td>
+    </tr>`).join('') || `<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--border2)">No results</td></tr>`;
 }
 
-// ── Status Update ─────────────────────────────────────────────────────────────
+function jiraSearch(v) { jSearchVal=v.toLowerCase(); renderJira(); }
+function jiraFilterStatus(v) { jStatusVal=v; renderJira(); }
+function jiraFilterPri(v) { jPriVal=v; renderJira(); }
+
 function updateStatus(id, status) {
-  const tc = testCases.find(t => t.id === id);
-  if (tc) {
-    tc.status = status;
-    if (status === 'Fail') openBugModal(id);
-    updateStats();
-  }
+  const tc = TCs.find(t=>t.id===id); if (!tc) return;
+  tc.status = status;
+  renderCases(); updateStats();
+  if (status==='Failed') openBugModal(id);
 }
 
 function updateStats() {
-  document.getElementById('stat-total').textContent  = testCases.length;
-  document.getElementById('stat-pass').textContent   = testCases.filter(t => t.status === 'Pass').length;
-  document.getElementById('stat-fail').textContent   = testCases.filter(t => t.status === 'Fail').length;
-  document.getElementById('stat-bugs').textContent   = bugReports.length;
-  document.getElementById('stat-critical').textContent = testCases.filter(t => t.priority === 'Critical').length;
-  document.getElementById('stat-notrun').textContent = testCases.filter(t => t.status === 'Not Run').length;
-  document.getElementById('bug-count').textContent   = bugReports.length;
+  document.getElementById('st-total').textContent  = TCs.length;
+  document.getElementById('st-pass').textContent   = TCs.filter(t=>t.status==='Done').length;
+  document.getElementById('st-fail').textContent   = TCs.filter(t=>t.status==='Failed').length;
+  document.getElementById('st-bugs').textContent   = bugs.length;
+  document.getElementById('st-crit').textContent   = TCs.filter(t=>t.priority==='Critical').length;
+  document.getElementById('st-notrun').textContent = TCs.filter(t=>t.status==='To Do').length;
+  document.getElementById('bug-badge').textContent = bugs.length;
 }
 
-// ── Filters ───────────────────────────────────────────────────────────────────
-function filterTC(filter, btn) {
-  currentFilter = filter;
-  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-  btn.classList.add('active');
-  renderTable(filter);
-}
-
-function searchTC(val) { renderTable(currentFilter, val); }
-
-// ── Tab Switch ────────────────────────────────────────────────────────────────
 function switchTab(name, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  document.getElementById('view-' + name).classList.add('active');
-  document.getElementById('filters-bar').style.display = (name === 'table' && testCases.length) ? 'flex' : 'none';
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  document.getElementById('view-'+name).classList.add('active');
 }
 
-// ── Bug Modal ─────────────────────────────────────────────────────────────────
-let bugIdCounter = 1;
-
+// ═══════════════════════════════════════════════════════════════════════════
+// BUG MODAL
+// ═══════════════════════════════════════════════════════════════════════════
 function openBugModal(tcId) {
-  activeTCRef = tcId;
-  const tc = tcId ? testCases.find(t => t.id === tcId) : null;
+  const tc = tcId ? TCs.find(t=>t.id===tcId) : null;
+  const bugId = `BUG-${String(bugNum).padStart(3,'0')}`;
+  const project = document.getElementById('cfg-project').value||'Project';
 
-  document.getElementById('bug-id-display').textContent = `BUG-${String(bugIdCounter).padStart(3,'0')}`;
-  document.getElementById('bug-date').value = new Date().toISOString().slice(0,10);
-  document.getElementById('bug-tc-ref').value = tcId || '';
-  document.getElementById('bug-reporter').value = document.getElementById('opt-author').value || '';
-  document.getElementById('bug-module').value = (tc?.module || document.getElementById('opt-module').value || '');
-  document.getElementById('bug-build').value = document.getElementById('opt-version').value || '';
+  document.getElementById('m-bug-id').textContent = bugId;
+  document.getElementById('m-date').value     = new Date().toISOString().slice(0,10);
+  document.getElementById('m-tc-ref').value   = tcId||'';
+  document.getElementById('m-reporter').value = document.getElementById('cfg-author').value||'';
+  document.getElementById('m-module').value   = tc?.epic||tc?.module||document.getElementById('cfg-module').value||'';
+  document.getElementById('m-fixver').value   = document.getElementById('cfg-version').value||'';
+  document.getElementById('e-to').value       = document.getElementById('def-to').value||'';
+  document.getElementById('e-cc').value       = document.getElementById('def-cc').value||'';
 
   if (tc) {
-    document.getElementById('bug-title').value = `[${tcId}] FAIL: ${tc.title}`;
-    document.getElementById('bug-steps').value = (tc.steps || []).map((s,i) => `${i+1}. ${s.action}`).join('\n');
-    document.getElementById('bug-expected').value = tc.expectedResult || '';
-    document.getElementById('bug-actual').value = tc.actualResult || '';
-    document.getElementById('bug-desc').value = `Defect found while executing test case ${tcId}. The test case "${tc.title}" failed.`;
+    document.getElementById('m-title').value    = `[${tc.key||tc.id}] FAIL: ${tc.summary||tc.title||''}`;
+    document.getElementById('m-steps').value    = (tc.steps||[]).map((s,i)=>`${i+1}. ${s.action}\n   Expected: ${s.expected}`).join('\n\n');
+    document.getElementById('m-expected').value = tc.expectedResult||'';
+    document.getElementById('m-actual').value   = '';
+    document.getElementById('m-desc').value     = `Defect found while executing ${tc.key||tc.id} on ${new Date().toLocaleDateString()}.\nTest: "${tc.summary||tc.title||''}"`;
+    document.getElementById('e-subject').value  = `[BUG] ${project} — ${tc.key||tc.id}: ${(tc.summary||tc.title||'').slice(0,60)}`;
   } else {
-    ['bug-title','bug-steps','bug-expected','bug-actual','bug-desc','bug-impact','bug-attachments'].forEach(id => {
-      document.getElementById(id).value = '';
-    });
+    ['m-title','m-steps','m-expected','m-actual','m-desc','m-impact','m-attach'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('e-subject').value = `[BUG] ${project} — New Defect Report`;
   }
-
-  document.getElementById('bug-modal').classList.add('open');
+  document.getElementById('bug-overlay').classList.add('open');
 }
 
-function closeBugModal() { document.getElementById('bug-modal').classList.remove('open'); }
+function closeBugModal() { document.getElementById('bug-overlay').classList.remove('open'); }
+document.getElementById('bug-overlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeBugModal(); });
+document.getElementById('prompt-overlay').addEventListener('click', e => { if(e.target===e.currentTarget) closePromptModal(); });
 
-function saveBugReport() {
-  const sev = document.querySelector('input[name="bug-sev"]:checked')?.value || 'Medium';
-  const bug = {
-    id: `BUG-${String(bugIdCounter++).padStart(3,'0')}`,
-    date: document.getElementById('bug-date').value,
-    tcRef: document.getElementById('bug-tc-ref').value,
-    reporter: document.getElementById('bug-reporter').value,
-    title: document.getElementById('bug-title').value,
-    severity: sev,
-    priority: document.getElementById('bug-priority').value,
-    status: document.getElementById('bug-status').value,
-    module: document.getElementById('bug-module').value,
-    assignee: document.getElementById('bug-assignee').value,
-    env: document.getElementById('bug-env').value,
-    build: document.getElementById('bug-build').value,
-    desc: document.getElementById('bug-desc').value,
-    steps: document.getElementById('bug-steps').value,
-    expected: document.getElementById('bug-expected').value,
-    actual: document.getElementById('bug-actual').value,
-    impact: document.getElementById('bug-impact').value,
-    attachments: document.getElementById('bug-attachments').value,
+function getBug() {
+  return {
+    id:       `BUG-${String(bugNum).padStart(3,'0')}`,
+    title:    document.getElementById('m-title').value,
+    tcRef:    document.getElementById('m-tc-ref').value,
+    date:     document.getElementById('m-date').value,
+    reporter: document.getElementById('m-reporter').value,
+    assignee: document.getElementById('m-assignee').value,
+    module:   document.getElementById('m-module').value,
+    env:      document.getElementById('m-env').value,
+    build:    document.getElementById('m-build').value,
+    priority: document.getElementById('m-priority').value,
+    status:   document.getElementById('m-status').value,
+    labels:   document.getElementById('m-labels').value,
+    fixver:   document.getElementById('m-fixver').value,
+    severity: document.querySelector('input[name="sev"]:checked')?.value||'Critical',
+    desc:     document.getElementById('m-desc').value,
+    steps:    document.getElementById('m-steps').value,
+    expected: document.getElementById('m-expected').value,
+    actual:   document.getElementById('m-actual').value,
+    impact:   document.getElementById('m-impact').value,
+    attach:   document.getElementById('m-attach').value,
   };
-  if (!bug.title) { showToast('Please enter a bug title', 'err'); return; }
-  bugReports.push(bug);
-  updateStats();
-  renderBugList();
-  closeBugModal();
-  showToast(`Bug ${bug.id} saved!`, 'ok');
 }
 
-function renderBugList() {
-  const el = document.getElementById('bug-list');
-  if (!bugReports.length) {
-    el.innerHTML = `<div class="empty-state" style="padding:40px"><div class="es-glyph" style="font-size:48px">🐛</div><h2 class="es-title" style="font-size:22px">No bugs reported yet</h2></div>`;
-    return;
-  }
-  const sevColor = { Critical: 'var(--red)', High: 'var(--gold)', Medium: 'var(--blue)', Low: 'var(--green)' };
-  el.innerHTML = bugReports.map(b => `
-    <div class="bug-card" style="border-left-color:${sevColor[b.severity]||'var(--red)'}">
-      <div class="bug-card-header">
-        <div>
-          <div class="bug-card-id">${b.id}</div>
-          <div class="bug-card-title">${b.title}</div>
-          <div class="bug-card-meta">
-            <span class="pri-badge pri-${(b.severity||'medium').toLowerCase()}">${b.severity}</span>
-            <span>📅 ${b.date}</span>
-            <span>🧩 ${b.module || '—'}</span>
-            <span>👤 ${b.reporter || '—'}</span>
-            <span>🏗 ${b.build || '—'}</span>
-            <span style="margin-left:auto">
-              <span class="status-badge status-not-run">${b.status}</span>
-            </span>
-          </div>
+function saveBug() {
+  const b = getBug();
+  if (!b.title) { toast('Please enter a bug title','err'); return; }
+  bugs.push(b); bugNum++;
+  updateStats(); renderBugGrid(); closeBugModal();
+  toast(`${b.id} saved!`,'ok');
+  switchTab('bugs', document.querySelectorAll('.tab')[2]);
+}
+
+function sendEmail() {
+  const b = getBug();
+  const to = document.getElementById('e-to').value;
+  const cc = document.getElementById('e-cc').value;
+  const subj = document.getElementById('e-subject').value||`[BUG] ${b.id}: ${b.title}`;
+  if (!to) { toast('Please enter a "To" email address','err'); return; }
+  if (!b.title) { toast('Please enter a bug title','err'); return; }
+
+  const body = encodeURIComponent(`Bug ID: ${b.id}
+TC Reference: ${b.tcRef||'N/A'}
+Severity: ${b.severity} | Priority: ${b.priority}
+Status: ${b.status}
+Reporter: ${b.reporter}
+Assignee: ${b.assignee||'TBD'}
+Module: ${b.module}
+Environment: ${b.env}
+Build: ${b.build}
+Labels: ${b.labels}
+
+━━━ SUMMARY ━━━
+${b.title}
+
+━━━ DESCRIPTION ━━━
+${b.desc}
+
+━━━ STEPS TO REPRODUCE ━━━
+${b.steps}
+
+━━━ EXPECTED vs ACTUAL ━━━
+✓ Expected: ${b.expected}
+✗ Actual:   ${b.actual}
+
+━━━ IMPACT ━━━
+${b.impact||'N/A'}
+
+Attachments: ${b.attach||'None'}
+
+—
+Sent from TestCase Studio Pro`);
+
+  const ccP = cc ? `&cc=${encodeURIComponent(cc)}` : '';
+  window.location.href = `mailto:${encodeURIComponent(to)}${ccP}&subject=${encodeURIComponent(subj)}&body=${body}`;
+  toast('Opening email client...','info');
+  setTimeout(() => { bugs.push(b); bugNum++; updateStats(); renderBugGrid(); closeBugModal(); }, 1200);
+}
+
+function downloadBug() {
+  const b = getBug();
+  if (!b.title) { toast('Please enter a bug title first','err'); return; }
+  const sevC = {Critical:'#C62828',High:'#E65100',Medium:'#1565C0',Low:'#1B5E20'};
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${b.id}</title>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',sans-serif;background:#F7F6F3}
+.wrap{max-width:760px;margin:0 auto;background:#fff;min-height:100vh}
+.head{background:${sevC[b.severity]||'#C62828'};color:#fff;padding:26px 30px}
+.head-top{display:flex;justify-content:space-between;align-items:flex-start}
+.eid{font-family:monospace;background:rgba(255,255,255,.18);padding:3px 12px;border-radius:20px;font-size:12px}
+.head h1{font-size:20px;font-weight:700;margin:10px 0 4px;line-height:1.3}
+.head p{font-size:12px;opacity:.8}
+.body{padding:26px 30px}
+.mg{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid #E0E0E0;border-radius:6px;overflow:hidden;margin-bottom:22px}
+.mc{padding:11px 13px;border-right:1px solid #E0E0E0;border-bottom:1px solid #E0E0E0}
+.mc:nth-child(3n){border-right:none}
+.ml{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9E9E9E;margin-bottom:3px}
+.mv{font-size:13px;color:#1A1A1A;font-weight:500}
+.sec{margin-bottom:18px}
+.sl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9E9E9E;border-bottom:2px solid ${sevC[b.severity]||'#C62828'};padding-bottom:5px;margin-bottom:8px}
+.sv{font-size:13px;color:#424242;line-height:1.8;white-space:pre-wrap;background:#F7F6F3;padding:11px 14px;border-radius:6px;border:1px solid #E0E0E0}
+.evg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.exp{background:#E8F5E9;border:1px solid #A5D6A7;border-radius:6px;padding:10px 13px;font-size:12px;color:#1B5E20;line-height:1.7;white-space:pre-wrap}
+.act{background:#FDECEA;border:1px solid #FFCDD2;border-radius:6px;padding:10px 13px;font-size:12px;color:#B71C1C;line-height:1.7;white-space:pre-wrap}
+@media print{body{background:#fff}.wrap{box-shadow:none}}
+</style></head><body><div class="wrap">
+<div class="head">
+  <div class="head-top"><span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;background:rgba(255,255,255,.15);padding:3px 10px;border-radius:3px">${b.severity} Severity</span><span class="eid">${b.id}</span></div>
+  <h1>${b.title}</h1>
+  <p>${b.date} · ${b.reporter} · ${b.module} · ${b.env||'QA'} · ${b.build||'—'}</p>
+</div>
+<div class="body">
+  <div class="mg">
+    ${[['TC Reference',b.tcRef||'—'],['Severity',b.severity],['Priority',b.priority],['Status',b.status],['Assignee',b.assignee||'—'],['Fix Version',b.fixver||'—'],['Environment',b.env||'—'],['Build',b.build||'—'],['Labels',b.labels||'—']].map(([l,v])=>`<div class="mc"><div class="ml">${l}</div><div class="mv">${v}</div></div>`).join('')}
+  </div>
+  <div class="sec"><div class="sl">Description</div><div class="sv">${b.desc||'—'}</div></div>
+  <div class="sec"><div class="sl">Steps to Reproduce</div><div class="sv">${b.steps||'—'}</div></div>
+  <div class="sec"><div class="sl">Expected vs Actual</div>
+    <div class="evg">
+      <div><div style="font-size:9px;font-weight:700;text-transform:uppercase;color:#1B5E20;margin-bottom:5px">✓ Expected</div><div class="exp">${b.expected||'—'}</div></div>
+      <div><div style="font-size:9px;font-weight:700;text-transform:uppercase;color:#B71C1C;margin-bottom:5px">✗ Actual</div><div class="act">${b.actual||'—'}</div></div>
+    </div>
+  </div>
+  ${b.impact?`<div class="sec"><div class="sl">Impact / Risk</div><div class="sv">${b.impact}</div></div>`:''}
+  ${b.attach?`<div class="sec"><div class="sl">Attachments</div><div class="sv">${b.attach}</div></div>`:''}
+</div></div></body></html>`;
+  const w = window.open('','_blank');
+  w.document.write(html); w.document.close();
+  setTimeout(()=>w.print(), 400);
+  toast('Bug report ready to print / save as PDF','ok');
+}
+
+function renderBugGrid() {
+  const bg = document.getElementById('bug-grid');
+  if (!bugs.length) { bg.innerHTML=`<div class="empty" style="grid-column:1/-1;padding:40px"><div class="e-glyph" style="font-size:48px">🐛</div><div class="e-title" style="font-size:22px">No bugs yet</div></div>`; return; }
+  const sc = {Critical:'bs-Critical',High:'bs-High',Medium:'bs-Medium',Low:'bs-Low'};
+  bg.innerHTML = bugs.map((b,i) => `
+    <div class="bug-card">
+      <div class="bug-stripe ${sc[b.severity]||'bs-Critical'}"></div>
+      <div class="bug-body">
+        <div class="bug-key">${b.id}${b.tcRef?' · '+b.tcRef:''}</div>
+        <div class="bug-title">${b.title}</div>
+        <div class="bug-meta">
+          <span class="badge b-${b.severity.toLowerCase()}">${b.severity}</span>
+          <span class="badge b-todo">${b.status}</span>
+          <span style="font-size:11px;color:var(--border2)">📅 ${b.date}</span>
+          <span style="font-size:11px;color:var(--border2)">🧩 ${b.module||'—'}</span>
         </div>
+        ${b.steps?`<div class="bug-section"><div class="bug-section-label">Steps to Reproduce</div><div class="bug-section-val">${b.steps}</div></div>`:''}
+        ${b.expected||b.actual?`<div class="bug-section"><div class="bug-section-label">Expected vs Actual</div><div class="bug-exp-act"><div class="bea-box bea-exp">✓ ${b.expected||'—'}</div><div class="bea-box bea-act">✗ ${b.actual||'—'}</div></div></div>`:''}
       </div>
-      <div class="bug-card-grid">
-        <div>
-          <div class="bug-section-title">Steps to Reproduce</div>
-          <div class="bug-section-body">${b.steps || '—'}</div>
-        </div>
-        <div>
-          <div class="bug-section-title">Expected vs Actual</div>
-          <div style="font-size:12px;color:var(--teal);margin-bottom:4px">✓ Expected: ${b.expected || '—'}</div>
-          <div style="font-size:12px;color:var(--red)">✗ Actual: ${b.actual || '—'}</div>
-        </div>
+      <div class="bug-foot">
+        <button class="tc-btn" onclick="resendBug(${i})">📧 Email</button>
+        <button class="tc-btn" onclick="printBugByIndex(${i})">⬇ PDF</button>
       </div>
-      ${b.impact ? `<div style="margin-top:10px"><div class="bug-section-title">Impact</div><div class="bug-section-body">${b.impact}</div></div>` : ''}
     </div>`).join('');
 }
 
-// ── Export ────────────────────────────────────────────────────────────────────
-function exportCSV() {
-  if (!testCases.length) { showToast('No test cases to export', 'err'); return; }
-  const headers = ['TC ID','Title','Module','Feature','Type','Priority','Objective','Prerequisites','Test Data','Steps','Expected Result','Status','Remarks'];
-  const rows = testCases.map(tc => [
-    tc.id, tc.title, tc.module||'', tc.feature||'', tc.type||'Functional',
-    tc.priority, tc.objective||'', tc.prerequisites||'',
-    tc.testData||'',
-    (tc.steps||[]).map((s,i)=>`${i+1}. ${s.action} → ${s.expected}`).join(' | '),
-    tc.expectedResult||'', tc.status, tc.remarks||''
-  ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(','));
-  const csv = [headers.join(','), ...rows].join('\n');
-  downloadBlob(csv, 'test-cases.csv', 'text/csv');
-  showToast('Exported CSV', 'ok');
+function resendBug(i) {
+  const b = bugs[i];
+  const to = document.getElementById('def-to').value || prompt('Send to:','');
+  if (!to) return;
+  const body = encodeURIComponent(`${b.id}: ${b.title}\nSeverity: ${b.severity}\n\nSteps:\n${b.steps}\n\nExpected: ${b.expected}\nActual: ${b.actual}`);
+  window.location.href = `mailto:${encodeURIComponent(to)}&subject=${encodeURIComponent('[BUG] '+b.id+': '+b.title)}&body=${body}`;
 }
 
+function printBugByIndex(i) {
+  const b = bugs[i];
+  const w = window.open('','_blank');
+  w.document.write(`<html><body style="font-family:Arial;padding:24px;color:#1A1A1A"><h2>${b.id}: ${b.title}</h2><p><b>Severity:</b> ${b.severity} | <b>Priority:</b> ${b.priority} | <b>Status:</b> ${b.status}</p><hr><h3>Steps to Reproduce</h3><pre>${b.steps}</pre><hr><p><b>Expected:</b> ${b.expected}</p><p><b>Actual:</b> ${b.actual}</p>${b.impact?`<hr><p><b>Impact:</b> ${b.impact}</p>`:''}</body></html>`);
+  w.document.close(); setTimeout(()=>w.print(),300);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════════════════════════════
 function exportExcel() {
-  if (!testCases.length) { showToast('No test cases to export', 'err'); return; }
-  const wsData = [
-    ['TC ID','Title','Module','Feature','Type','Priority','Objective','Prerequisites','Test Data','Test Steps','Expected Result','Actual Result','Status','Remarks'],
-    ...testCases.map(tc => [
-      tc.id, tc.title, tc.module||'', tc.feature||'', tc.type||'Functional',
-      tc.priority, tc.objective||'', tc.prerequisites||'', tc.testData||'',
-      (tc.steps||[]).map((s,i)=>`Step ${i+1}: ${s.action}\nExpected: ${s.expected}`).join('\n\n'),
-      tc.expectedResult||'', tc.actualResult||'', tc.status, tc.remarks||''
+  if (!TCs.length) { toast('No test cases to export','err'); return; }
+  const proj = document.getElementById('cfg-project').value||'Project';
+  const ws1data = [
+    ['Key','Summary','Epic','Feature','Type','Priority','Preconditions','Test Data','Test Steps','Expected Result','Actual Result','Status','Assignee','Version','Labels'],
+    ...TCs.map(tc => [
+      tc.key, tc.summary||tc.title||'', tc.epic||tc.module||'', tc.feature||'',
+      tc.type||'Functional', tc.priority, tc.preconditions||tc.prerequisites||'',
+      tc.testData||'',
+      (tc.steps||[]).map((s,i)=>`Step ${i+1}: ${s.action} → ${s.expected}`).join('\n'),
+      tc.expectedResult||'', tc.actualResult||'', tc.status, tc.assignee||'',
+      tc.fixVersion||tc.version||'', (tc.labels||[]).join(',')
     ])
   ];
-
-  const bugData = bugReports.length ? [
-    ['Bug ID','Title','Severity','Priority','Status','Module','Reporter','Date','Env','Build','Steps to Reproduce','Expected','Actual','Impact','TC Reference'],
-    ...bugReports.map(b => [
-      b.id, b.title, b.severity, b.priority, b.status,
-      b.module, b.reporter, b.date, b.env, b.build,
-      b.steps, b.expected, b.actual, b.impact, b.tcRef
-    ])
+  const ws2data = bugs.length ? [
+    ['Bug ID','Summary','Severity','Priority','Status','TC Ref','Module','Reporter','Date','Env','Build','Steps','Expected','Actual','Impact','Labels'],
+    ...bugs.map(b=>[b.id,b.title,b.severity,b.priority,b.status,b.tcRef,b.module,b.reporter,b.date,b.env,b.build,b.steps,b.expected,b.actual,b.impact,b.labels])
   ] : [['No bugs reported']];
 
   const wb = XLSX.utils.book_new();
-  const wsTC = XLSX.utils.aoa_to_sheet(wsData);
-  wsTC['!cols'] = [10,30,14,14,12,10,24,20,20,40,30,20,12,16].map(w=>({wch:w}));
-  XLSX.utils.book_append_sheet(wb, wsTC, 'Test Cases');
-  const wsBug = XLSX.utils.aoa_to_sheet(bugData);
-  XLSX.utils.book_append_sheet(wb, wsBug, 'Bug Reports');
-
-  const proj = document.getElementById('opt-project').value || 'TestCases';
-  XLSX.writeFile(wb, `${proj}_ISTQB_TestCases.xlsx`);
-  showToast('Exported Excel with Bug Reports sheet', 'ok');
+  const ws1 = XLSX.utils.aoa_to_sheet(ws1data);
+  ws1['!cols'] = [12,35,14,14,12,10,24,24,48,30,20,14,14,10,14].map(w=>({wch:w}));
+  XLSX.utils.book_append_sheet(wb, ws1, 'Test Cases');
+  const ws2 = XLSX.utils.aoa_to_sheet(ws2data);
+  XLSX.utils.book_append_sheet(wb, ws2, 'Bug Reports');
+  XLSX.writeFile(wb, `${proj.replace(/\s+/g,'_')}_TestCaseStudioPro.xlsx`);
+  toast('Excel exported — Test Cases + Bug Reports','ok');
 }
 
-function exportBugPDF() {
-  const bug = {
-    id: document.getElementById('bug-id-display').textContent,
-    date: document.getElementById('bug-date').value,
-    tcRef: document.getElementById('bug-tc-ref').value,
-    reporter: document.getElementById('bug-reporter').value,
-    title: document.getElementById('bug-title').value,
-    severity: document.querySelector('input[name="bug-sev"]:checked')?.value || '—',
-    priority: document.getElementById('bug-priority').value,
-    status: document.getElementById('bug-status').value,
-    module: document.getElementById('bug-module').value,
-    assignee: document.getElementById('bug-assignee').value,
-    env: document.getElementById('bug-env').value,
-    build: document.getElementById('bug-build').value,
-    desc: document.getElementById('bug-desc').value,
-    steps: document.getElementById('bug-steps').value,
-    expected: document.getElementById('bug-expected').value,
-    actual: document.getElementById('bug-actual').value,
-    impact: document.getElementById('bug-impact').value,
-  };
-
-  const html = `<!DOCTYPE html><html><head><style>
-    body{font-family:Arial,sans-serif;margin:0;padding:0;color:#111}
-    .header{background:#C0392B;color:#fff;padding:24px 32px}
-    .header h1{font-size:24px;margin:0}
-    .header p{font-size:13px;margin:4px 0 0;opacity:0.85}
-    .body{padding:24px 32px}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-    .field label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#888;font-weight:bold}
-    .field p{font-size:13px;margin:3px 0 0;border-bottom:1px solid #eee;padding-bottom:6px}
-    .section{margin-bottom:16px}
-    .section h3{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888;border-bottom:2px solid #C0392B;padding-bottom:4px;margin-bottom:8px}
-    .section p{font-size:13px;white-space:pre-wrap;line-height:1.6}
-    .badge{display:inline-block;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:bold;background:#FDECEA;color:#C0392B}
-  </style></head><body>
-    <div class="header"><h1>🐛 Bug Report — ${bug.id}</h1><p>${bug.title}</p></div>
-    <div class="body">
-      <div class="grid">
-        <div class="field"><label>Bug ID</label><p>${bug.id}</p></div>
-        <div class="field"><label>Date</label><p>${bug.date}</p></div>
-        <div class="field"><label>TC Reference</label><p>${bug.tcRef || '—'}</p></div>
-        <div class="field"><label>Reporter</label><p>${bug.reporter || '—'}</p></div>
-        <div class="field"><label>Severity</label><p><span class="badge">${bug.severity}</span></p></div>
-        <div class="field"><label>Priority</label><p>${bug.priority}</p></div>
-        <div class="field"><label>Module</label><p>${bug.module || '—'}</p></div>
-        <div class="field"><label>Assigned To</label><p>${bug.assignee || '—'}</p></div>
-        <div class="field"><label>Environment</label><p>${bug.env || '—'}</p></div>
-        <div class="field"><label>Build / Version</label><p>${bug.build || '—'}</p></div>
-      </div>
-      <div class="section"><h3>Description</h3><p>${bug.desc || '—'}</p></div>
-      <div class="section"><h3>Steps to Reproduce</h3><p>${bug.steps || '—'}</p></div>
-      <div class="section"><h3>Expected Result</h3><p>${bug.expected || '—'}</p></div>
-      <div class="section"><h3>Actual Result</h3><p>${bug.actual || '—'}</p></div>
-      ${bug.impact ? `<div class="section"><h3>Impact / Risk</h3><p>${bug.impact}</p></div>` : ''}
-    </div>
-  </body></html>`;
-
-  const w = window.open('', '_blank');
-  w.document.write(html);
-  w.document.close();
-  w.focus();
-  setTimeout(() => w.print(), 400);
-}
-
-function downloadBlob(content, filename, type) {
+function exportCSV() {
+  if (!TCs.length) { toast('No test cases to export','err'); return; }
+  const rows = [
+    ['Key','Summary','Priority','Type','Status','Expected Result','Assignee'],
+    ...TCs.map(tc=>[tc.key,tc.summary||tc.title||'',tc.priority,tc.type||'',tc.status,tc.expectedResult||'',tc.assignee||''])
+  ].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([content], { type }));
-  a.download = filename;
-  a.click();
+  a.href = URL.createObjectURL(new Blob([rows.join('\n')],{type:'text/csv'}));
+  a.download = 'test-cases.csv'; a.click();
+  toast('CSV exported','ok');
 }
 
-// ── Toast ─────────────────────────────────────────────────────────────────────
-function showToast(msg, type = 'ok') {
+// ═══════════════════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════════════════
+function toast(msg, type='ok') {
   const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = `toast show ${type}`;
-  setTimeout(() => el.classList.remove('show'), 3500);
+  el.textContent = msg; el.className = `toast show ${type}`;
+  clearTimeout(el._t); el._t = setTimeout(()=>el.classList.remove('show'),3500);
 }
-
-// ── Close modal on overlay click ──────────────────────────────────────────────
-document.getElementById('bug-modal').addEventListener('click', e => {
-  if (e.target === e.currentTarget) closeBugModal();
-});
 </script>
 </body>
 </html>
