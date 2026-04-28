@@ -82,7 +82,7 @@ API key stored only in browser `localStorage`. All processing is directly betwee
 # 🤖 Using TestCase Studio Pro WITHOUT an API Key
 You have 3 free options to use this tool without any API key or subscription.
 
-## Option 1 — Claude.ai (Free tier available)
+### Option 1 — Claude.ai (Free tier available)
 Best for: Most accurate ISTQB/Jira output
 
 Open the tool → Toggle AI Source to "Manual (No API)"
@@ -96,7 +96,7 @@ Back in the tool → paste into the "Import JSON" box → click Import
 
 ✅ Done! Your test cases appear instantly.
 
-## Option 2 — ChatGPT (Free tier available)
+### Option 2 — ChatGPT (Free tier available)
 Best for: Familiar interface
 Same steps as above, but go to → https://chat.openai.com
 
@@ -104,7 +104,7 @@ Tip: Use GPT-4o for best results. If the output is truncated, ask:
 "Continue the JSON from where you stopped"
 
 
-## Option 3 — Google Gemini (Free)
+### Option 3 — Google Gemini (Free)
 Best for: Google Workspace users
 Same steps, go to → https://gemini.google.com
 
@@ -112,17 +112,17 @@ Same steps, go to → https://gemini.google.com
 Best for: Teams with data privacy requirements
 Setup (one-time, ~5 minutes)
 bash# 1. Install Ollama
-# Windows: https://ollama.com/download/windows
-# Mac:     https://ollama.com/download/mac
+### Windows: https://ollama.com/download/windows
+### Mac:     https://ollama.com/download/mac
 
-# 2. Pull a model (choose one)
+### 2. Pull a model (choose one)
 ollama pull llama3.1          # 8B — fast, decent quality
 ollama pull mistral           # 7B — great for structured output
 ollama pull qwen2.5:14b       # 14B — best quality for test cases
 
-# 3. Start Ollama server
+### 3. Start Ollama server
 ollama serve
-# This runs a local API at http://localhost:11434
+### This runs a local API at http://localhost:11434
 Use with the tool
 
 Open index.html
@@ -135,9 +135,9 @@ Note: Ollama mode uses a slightly simplified JSON request.
 Quality depends on the model. llama3.1 or qwen2.5 recommended.
 
 
-#### Expected JSON Format
+### Expected JSON Format
 When pasting AI output, it must match this structure:
-json{
+```json{
   "analysis": "Brief summary of what was analyzed",
   "project": "Project Name",
   "module": "Module Name",
@@ -167,7 +167,7 @@ json{
       "remarks": ""
     }
   ]
-}
+} ```
 
 ## Tips for Better Results
 
